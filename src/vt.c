@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -19,14 +20,17 @@ typedef FB      *FBListValType;
 
 #include "list.h"
 
-static  char            *ttynames[]={"/dev/tty0", "/dev/tty", NULL};
-static  char            *ttyfmts[]={"/dev/tty%d", "/dev/tty%02x", "/dev/tty%x", "/dev/tty%02d", NULL};
+static  char            *ttynames[]={"/dev/vc/0", "/dev/tty0", "/dev/tty", NULL};
+static  char            *ttyfmts[]={"/dev/vc/%d", "/dev/tty%d", "/dev/tty%02x", "/dev/tty%x", "/dev/tty%02d", NULL};
 static  int             cttyname = 0;
+static  int             ctty;
 static  int             originaltty;
-static  struct vt_mode  vtm;
+static  int             kd_mode;
+static  struct vt_mode  vt_mode;
 /*static*/      unsigned short  switching;              /* Flag to prevent reentrancy */
 
 /*static*/      void FBVTswitch(int s);
+static void FBVTdetach(FB *f);
 
 static  FBList          ttylist;
 static  unsigned short  listinit = FALSE;
@@ -37,10 +41,11 @@ FBVTopen(FB *f)
   char            ttynam[11];
   int             i = 0;
   struct vt_stat  vts;
+  struct vt_mode  vtm;
 
   /* Open current console */
 
-  while ( ( f->tty = open( ttynames[cttyname], O_WRONLY ) ) == -1 )
+  while ( ( ctty = open( ttynames[cttyname], O_RDWR ) ) == -1 )
   {
     FBerror( WARNING | SYSERR, "FBVTopen: open failed on %s",
              ttynames[cttyname]);
@@ -55,102 +60,88 @@ FBVTopen(FB *f)
     }
   }
 
-  if ( f->vtchoice == FB_KEEP_CURRENT_VC )
-  {
-    /* Get current VT number so we can switch back to it later */
-
-    if ( ioctl( f->tty, VT_GETSTATE, &vts ) == -1 )
-    {
-      FBerror( FATAL | SYSERR, "FBVTopen: couldn't get VT state");
-    }
-    f->ttyno = vts.v_active;
-    f->keeptty = TRUE;
-  }
-  else if ( f->vtchoice == FB_OPEN_NEW_VC )
-  {
-    /* Get number of free VT */
-
-    if ( ioctl( f->tty, VT_OPENQRY, &f->ttyno ) == -1 )
-    {
-      FBerror( FATAL | SYSERR, "FBVTopen: no free ttys");
-    }
-    f->keeptty = FALSE;
-  }
-  else
-  {
-    FBerror( FATAL | SYSERR, "FBVTopen: please pass correct options!" );
-  }
-
-  /* Close current console */
-
-  if ( close( f->tty ) == -1 )
-  {
-    FBerror( WARNING | SYSERR, "FBVTopen: failed to close %s",
-             ttynames[cttyname]);
-  }
-
-  /* Open new VT */
-
-  do
-  {
-    (void) sprintf( ttynam, ttyfmts[i++], f->ttyno );
-  }
-  while ( ( ttyfmts[i] != NULL ) &&
-          ( f->tty = open( ttynam, O_RDONLY )) == -1 );
-
-  if ( f->tty == -1 )
-  {
-    FBerror( FATAL | SYSERR, "FBVTopen: failed to open %s", ttynam);
-  }
-
-  /* junk from Xserver... clean up later */
-
-  /*if (!f->keeptty)
-    {
-    setpgrp();
-    }
-    chown(ttynam,getuid(),getgid());
-    chown("/dev/console",getuid(),getgid());
-    chown("/dev/tty0",getuid(),getgid());*/
-
-  /* This seems necessary for us to do, but I'm still not sure why. */
-#if 0
-  if (f->keeptty)
-#endif
-    {
-      int i;
-      if ((i=open("/dev/tty",O_RDWR))>=0)
-	{
-	  ioctl(i,TIOCNOTTY,0);
-	  close(i);
-	}
-      /*setsid();*/
-      /*ioctl(f->tty,TIOCSCTTY);*/
-    }
-
   /* Get current VT number so we can switch back to it later */
 
-  if ( ioctl( f->tty, VT_GETSTATE, &vts ) == -1 )
+  if ( ioctl( ctty, VT_GETSTATE, &vts ) == -1 )
   {
     FBerror( FATAL | SYSERR, "FBVTopen: couldn't get VT state");
   }
   originaltty = vts.v_active;
 
-  /* Switch to new VT */
-        
-  if ( ioctl( f->tty, VT_ACTIVATE, f->ttyno ) == -1 )
+  if ( f->vtchoice == FB_KEEP_CURRENT_VC )
   {
-    FBerror( FATAL | SYSERR, "FBVTopen: couldn't switch to VT %d", f->ttyno);
-  }
+    f->tty = 0;
+    f->ttyno = originaltty;
+    f->keeptty = TRUE;
 
-  /* Wait for new VT to become active */
-
-  if ( ioctl( f->tty, VT_WAITACTIVE, f->ttyno ) == -1 )
+    if ( close( ctty ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: failed to close controlling VT");
+    }
+ }
+  else if ( f->vtchoice == FB_OPEN_NEW_VC )
   {
-    FBerror( FATAL | SYSERR, "FBVTopen: VT %d didn't become active", f->ttyno);
+    /* Get number of free VT */
+
+    if ( ioctl( ctty, VT_OPENQRY, &f->ttyno) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: no free ttys");
+    }
+    f->keeptty = FALSE;
+
+    /* Find an accessible VT */
+
+    while ( ttyfmts[i] != NULL )
+    {
+      (void) sprintf( ttynam, ttyfmts[i++], f->ttyno );
+      chown( ttynam, getuid(), getgid() );
+      if ( access( ttynam, R_OK | W_OK ) != -1 )
+      {
+        break;
+      }
+    }
+
+    if ( close( ctty ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: failed to close controlling VT");
+    }
+
+    /* Detach from our controlling terminal */
+
+    FBVTdetach( f );
+
+    /* Open new VT */
+
+    close( 0 );
+    close( 1 );
+    close( 2 );
+
+    f->tty = open( ttynam, O_RDWR );
+    if ( f->tty == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: failed to open %s", ttynam);
+    }
+    dup( 0 );
+    dup( 0 );
+
+    /* Switch to new VT */
+
+    if ( ioctl( f->tty, VT_ACTIVATE, f->ttyno ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: couldn't switch to VT %d", f->ttyno);
+    }
+
+    /* Wait for new VT to become active */
+
+    if ( ioctl( f->tty, VT_WAITACTIVE, f->ttyno ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTopen: VT %d didn't become active", f->ttyno);
+    }
   }
-  f->visible=TRUE;
-  f->drawing=FALSE;
+  else
+  {
+    FBerror( FATAL | SYSERR, "FBVTopen: please pass correct options!" );
+  }
 
   /* Get mode of new VT */
 
@@ -176,9 +167,15 @@ FBVTopen(FB *f)
     FBerror( FATAL | SYSERR, "FBVTopen: Couldn't set mode of VT %d", f->ttyno);
   }
 
+  /* Save current keybard mode */
+
+  if ( ioctl( f->tty, KDGETMODE, &kd_mode ) == -1 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTopen: Couldn't get keyboard mode on VT %d", f->ttyno);
+  }
+
   /* Disable cursor */
 
-        
   if ( ioctl( f->tty, KDSETMODE, KD_GRAPHICS ) == -1 )
   {
     FBerror( FATAL | SYSERR, "FBVTopen: Couldn't set keyboard graphics mode on VT %d", f->ttyno);
@@ -200,6 +197,56 @@ FBVTopen(FB *f)
 
     FBkbdopen( f );
   }
+
+  f->visible=TRUE;
+  f->drawing=FALSE;
+
+}
+
+static void
+FBVTdetach(FB *f)
+{
+#if 1
+  int child;
+
+  /* Fork to background */
+
+  child = fork();
+
+  if ( child < 0 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTdetach: Failed to fork" );
+  }
+  else if ( child )
+  {
+    exit( 0 );
+  }
+
+  setsid();
+#else
+  int ctty;
+  struct vt_stat vts;
+
+  ctty = open( "/dev/tty", O_RDONLY );
+  if ( ctty < 0 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTdetach: Couldn't open /dev/tty");
+  }
+
+  if ( ioctl( ctty, VT_GETSTATE, &vts ) == -1 )
+  {
+    return;
+  }
+
+  /* Detach from our controlling terminal, and start a new session */
+
+  if ( ioctl( ctty, TIOCNOTTY, 0) == -1 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTdetach: Couldn't detach from controlling terminal");
+  }
+
+  close( ctty );
+#endif
 }
 
 FB *
@@ -316,7 +363,7 @@ FBVTswitch(int s)
 
     if ( ioctl(f->tty, VT_RELDISP, 1) == -1 )
     {
-      FBerror( FATAL | SYSERR, "FBVTswitch: switch away from VT %d denied", f->tty);
+      FBerror( FATAL | SYSERR, "FBVTswitch: switch away from VT %d denied", f->ttyno);
     }
   }
   else
@@ -324,7 +371,7 @@ FBVTswitch(int s)
     /* Acknowledge switch back to this VT */
     if ( ioctl(f->tty, VT_RELDISP, VT_ACKACQ) == -1 )
     {
-      FBerror( FATAL | SYSERR, "FBVTswitch: switch to VT %d denied", f->tty);
+      FBerror( FATAL | SYSERR, "FBVTswitch: switch to VT %d denied", f->ttyno);
     }
 
     /* Map framebuffer back into memory */
@@ -372,6 +419,20 @@ FBVTswitchfb(FB *f)
 void
 FBVTclose(FB *f)
 {
+  /* Enable cursor */
+
+  if ( ioctl( f->tty, KDSETMODE, kd_mode ) == -1 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTclose: Couldn't restore keyboard mode on VT %d", f->ttyno);
+  }
+
+  /* Restore mode parameters */
+
+  if ( ioctl( f->tty, VT_SETMODE, &vt_mode ) == -1 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTclose: Couldn't restore mode of VT %d", f->ttyno);
+  }
+
   if (f->handle_kbd) {
     /* Close keyboard */
 
@@ -385,54 +446,29 @@ FBVTclose(FB *f)
     FBfree(f->sbak);
   }
 
-  /* Enable cursor */
-
-  if ( ioctl( f->tty, KDSETMODE, KD_TEXT ) == -1 )
+  if ( !f->keeptty )
   {
-    FBerror( FATAL | SYSERR, "FBVTclose: Couldn't set keyboard graphics mode on VT %d", f->ttyno);
-  }
+    /* Switch back to original VT */
 
-  /* Restore mode parameters */
-
-  vtm.mode = VT_AUTO;
-
-  /* Set new mode parameters */
-
-  if ( ioctl( f->tty, VT_SETMODE, &vtm ) == -1 )
-  {
-    FBerror( FATAL | SYSERR, "FBVTclose: Couldn't set mode of VT %d", f->ttyno);
-  }
-
-  /* Switch back to original VT */
-
-  if ( ioctl( f->tty, VT_ACTIVATE, originaltty ) == -1 )
-  {
-    FBerror( FATAL | SYSERR, "FBVTclose: couldn't switch to VT %d", originaltty);
-  }
-  if ( ioctl( f->tty, VT_WAITACTIVE, originaltty ) == -1 )
-  {
-    FBerror( FATAL | SYSERR, "FBVTclose: couldn't wait for VT %d", originaltty);
-  }
-
-#if 0
-  /* Deallocate VT if we opened a new one */
-  if(f->vtchoice == FB_OPEN_NEW_VC)
-    {  
-      if(ioctl(f->tty, VT_DISALLOCATE, f->ttyno) == -1 )
-	{
-	  FBerror( WARNING | SYSERR, "FBVTclose: couldn't deallocate VT %d", f->ttyno);
-	}
+    if ( ioctl( f->tty, VT_ACTIVATE, originaltty ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTclose: couldn't switch to VT %d", originaltty);
     }
-#endif
+    if ( ioctl( f->tty, VT_WAITACTIVE, originaltty ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTclose: couldn't wait for VT %d", originaltty);
+    }
 
-  /* Close VT */
+    /* Close VT */
 
-  if ( close( f->tty ) == -1 )
-  {
-    FBerror( FATAL | SYSERR, "FBVTclose: failed to close VT");
+    if ( close( f->tty ) == -1 )
+    {
+      FBerror( FATAL | SYSERR, "FBVTclose: failed to close VT");
+    }
   }
 
   /* Remove from ttylist */
 
   ttylist = FBListRemoveKey( ttylist, f->ttyno );
 }
+

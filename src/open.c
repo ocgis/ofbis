@@ -32,7 +32,10 @@ FBopen( const char *fbname, unsigned short opts )
     
     fbname = getenv("FRAMEBUFFER");
     if ( !fbname ) {
-      fbname = "/dev/fb0";
+      if ( access("/dev/.devfsd", F_OK) == 0 )  /* devfs detected */
+	fbname = "/dev/fb/0";
+      else
+	fbname = "/dev/fb0";
     }
   }
 

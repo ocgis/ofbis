@@ -40,7 +40,7 @@ FBmouseopen(void)
   {
     calls++;
 
-    if((msefd = open(GPMDATADEVICE, O_RDWR | O_NDELAY )) != -1)
+    if((msefd = open(GPMDATADEVICE, O_RDONLY | O_NDELAY )) != -1)
     {
       devtype = DEV_TYPE_GPMDATA;
       
@@ -54,7 +54,7 @@ FBmouseopen(void)
       /* Flush input */
       tcflush(msefd, TCIFLUSH);
     }
-    else if((msefd = open(MOUSEDEVICE, O_RDWR | O_NDELAY )) != -1)
+    else if((msefd = open(MOUSEDEVICE, O_RDONLY | O_NDELAY )) != -1)
     {
       devtype = DEV_TYPE_MOUSE;
       
