@@ -12,6 +12,7 @@ FBerror( unsigned short flags, const char *fmt, ... )
 {
 	unsigned short fatal = flags & FATAL;
 	unsigned short syserr = flags & SYSERR;
+	static int in_fatal = 0;
 	va_list args;
 	va_start( args, fmt );
 
@@ -23,8 +24,12 @@ FBerror( unsigned short flags, const char *fmt, ... )
 		printf( " : %s", strerror(errno) );
 	}
 	putchar('\n');
-	if (fatal)
+	if (fatal) {
+		if(in_fatal)
+		  exit(1);
+		in_fatal = 1;
 		FBshutdown();
+	}
 }
 
 /* Shutdown ofbis in case of a fatal error */
@@ -34,6 +39,7 @@ FBshutdown( void )
 {
 	FB	*f;
 
+	/* Close all opened framebuffers */
 	while ( ( f=FBfindFB() ) != NULL )
 	{
 		FBclose(f);
