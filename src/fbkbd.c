@@ -128,6 +128,7 @@ translate_key (int  fd,
 ** Process a keypress
 **
 ** 1999-03-10 CG
+** 1999-04-05 CG
 */
 void
 FBprocesskey( FB *f, FBKEYEVENT *ev )
@@ -214,7 +215,18 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   }
   ev->keycode = key;
   ev->state = state;
-  ev->ascii = KVAL (keycode);
+
+  if (KTYP (keycode) == KT_SPEC) {
+    switch (keycode) {
+    case K_ENTER :
+      ev->ascii = 10;
+      break;
+    default :
+      ev->ascii = KVAL (keycode);
+    }
+  } else {
+    ev->ascii = KVAL (keycode);
+  }
 
   /* Search for special keys now */
 
