@@ -1,0 +1,11 @@
+Makefile
+libtool
+.deps
+.libs
+config.log
+config.h
+fbtst
+stamp-h
+config.status
+ofbis-config
+config.cache
