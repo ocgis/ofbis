@@ -82,8 +82,8 @@ sp8_bitblt( FB *f, FBBLTPBLK *fbb )
 {
   char *sbase, *dbase;
   int hcnt;
-  sbase = (char *) (fbb->s_form + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
-  dbase = (char *) (fbb->d_form + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
+  sbase = (char *) (((char *) fbb->s_form) + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
+  dbase = (char *) (((char *) fbb->d_form) + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
 
   for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
     memcpy((void *) dbase, (void *) sbase, fbb->b_wd);
