@@ -83,7 +83,6 @@ FBc24_to_cnative( FB *f, u_int32_t col24 )
   int nr_of_colours, best_diff, best_match, i, diff;
   int red, green, blue;
   FBCMAP *fbcmap;
-  unsigned char *cp= (char *)&col24;
   u_int16_t pval;
 
   /* For palette based modes, we try to find the best matching
@@ -113,15 +112,10 @@ FBc24_to_cnative( FB *f, u_int32_t col24 )
     return best_match;
   }
 
-  /*         0RRRRRGGGGGBBBBB
-     RRRRRRRRGGGGGGGGBBBBBBBB
-
-   */
-
   /* Truecolor */  
-  pval = ((((cp[1] >> (8 - f->vinf.red.length)) & ((1 << f->vinf.red.length) - 1)) << f->vinf.red.offset) |
-	  (((cp[2] >> (8 - f->vinf.green.length)) & ((1 << f->vinf.green.length) - 1)) << f->vinf.green.offset) |
-	  (((cp[3] >> (8 - f->vinf.blue.length)) & ((1 << f->vinf.blue.length) - 1)) << f->vinf.blue.offset));
+  pval = ((((col24 >> (16 + 8 - f->vinf.red.length))   & ((1 << f->vinf.red.length)   - 1)) << f->vinf.red.offset) |
+	  (((col24 >> ( 8 + 8 - f->vinf.green.length)) & ((1 << f->vinf.green.length) - 1)) << f->vinf.green.offset) |
+	  (((col24 >> ( 0 + 8 - f->vinf.blue.length))  & ((1 << f->vinf.blue.length)  - 1)) << f->vinf.blue.offset));
   return (u_int32_t)pval;
 }
 
