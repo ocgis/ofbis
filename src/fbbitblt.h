@@ -3,8 +3,9 @@
 
 #include "libfb.h"
 
-/* Bitblt function */
+/* Bitblt functions */
 
+void	sp8_bitblt( FB *f, FBBLTPBLK *fbb );
 void	bitblt( FB *f, FBBLTPBLK *fbb );
 
 #endif
