@@ -1,1 +1,5 @@
-Latest version is 0.0.6
+Latest version is 0.0.7
+
+1998-10-27	Tomas Berndtsson
+		FBchunk_to_native convert function added, with
+		support from 8-bit chunk to interleaved 8 planes. 

@@ -81,14 +81,14 @@ lib_LTLIBRARIES = libfb.la
 libfb_la_SOURCES = \
 	fballoc.c fbbitblt.c fbchar.c fbcmap.c fbdebug.c fberror.c fbevent.c \
 	fbfuncs.c fbhline.c fbkbd.c fbline.c fbmouse.c fbopen.c fbpixel.c \
-	fbset.c fbvt.c font_6x11.c font_8x8.c font_8x16.c \
+	fbset.c fbvt.c fbconvert.c font_6x11.c font_8x8.c font_8x16.c \
 	fballoc.h fberror.h fbhline.h fbkeytbl.h fbmmap.h fbvt.h \
 	fbbitblt.h fbevent.h fbkbd.h fbline.h fbmouse.h fbchar.h fbfuncs.h \
-	fbkeys.h fblist.h fbpixel.h
+	fbkeys.h fblist.h fbpixel.h fbconvert.h
 
 # This is a bad versioning system, since much has changed
 # in the interface during its early development.
-libfb_la_LDFLAGS = -version-info 0:6:0
+libfb_la_LDFLAGS = -version-info 0:7:0
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -102,8 +102,8 @@ LIBS = @LIBS@
 libfb_la_LIBADD = 
 libfb_la_OBJECTS =  fballoc.lo fbbitblt.lo fbchar.lo fbcmap.lo \
 fbdebug.lo fberror.lo fbevent.lo fbfuncs.lo fbhline.lo fbkbd.lo \
-fbline.lo fbmouse.lo fbopen.lo fbpixel.lo fbset.lo fbvt.lo font_6x11.lo \
-font_8x8.lo font_8x16.lo
+fbline.lo fbmouse.lo fbopen.lo fbpixel.lo fbset.lo fbvt.lo fbconvert.lo \
+font_6x11.lo font_8x8.lo font_8x16.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
@@ -118,10 +118,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/fballoc.P .deps/fbbitblt.P .deps/fbchar.P \
-.deps/fbcmap.P .deps/fbdebug.P .deps/fberror.P .deps/fbevent.P \
-.deps/fbfuncs.P .deps/fbhline.P .deps/fbkbd.P .deps/fbline.P \
-.deps/fbmouse.P .deps/fbopen.P .deps/fbpixel.P .deps/fbset.P \
-.deps/fbvt.P .deps/font_6x11.P .deps/font_8x16.P .deps/font_8x8.P
+.deps/fbcmap.P .deps/fbconvert.P .deps/fbdebug.P .deps/fberror.P \
+.deps/fbevent.P .deps/fbfuncs.P .deps/fbhline.P .deps/fbkbd.P \
+.deps/fbline.P .deps/fbmouse.P .deps/fbopen.P .deps/fbpixel.P \
+.deps/fbset.P .deps/fbvt.P .deps/font_6x11.P .deps/font_8x16.P \
+.deps/font_8x8.P
 SOURCES = $(libfb_la_SOURCES)
 OBJECTS = $(libfb_la_OBJECTS)
 

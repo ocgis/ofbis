@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(fbtst.c)
-OFBIS_VERSION=0.0.6
+OFBIS_VERSION=0.0.7
 AM_INIT_AUTOMAKE(ofbis, $OFBIS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
@@ -42,4 +42,5 @@ src/Makefile
 doc/Makefile
 Makefile
 ofbis-config
+ofbis.m4
 ])

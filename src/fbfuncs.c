@@ -5,6 +5,7 @@
 #include "fbline.h"
 #include "fbbitblt.h"
 #include "fbchar.h"
+#include "fbconvert.h"
 
 static void
 setinterleave1( FB *f )
@@ -14,6 +15,7 @@ setinterleave1( FB *f )
 	f->hline = &i2hl1;
 	f->line = &genln;
 	f->putchar = &i2pc1;
+	f->sp8_convert = &sp8_to_i1;
 }
 
 static void
@@ -24,6 +26,7 @@ setinterleave2( FB *f )
 	f->hline = &i2hl2;
 	f->line = &genln;
 	f->putchar = &i2pc2;
+	f->sp8_convert = &sp8_to_i2;
 }
 
 static void
@@ -34,6 +37,7 @@ setinterleave4( FB *f )
 	f->hline = &i2hl4;
 	f->line = &genln;
 	f->putchar = &i2pc4;
+	f->sp8_convert = &sp8_to_i4;
 }
 
 static void
@@ -44,6 +48,7 @@ setinterleave8( FB *f )
 	f->hline = &i2hl8;
 	f->line = &genln;
 	f->putchar = &i2pc8;
+	f->sp8_convert = &sp8_to_i8;
 }
 
 static void
@@ -54,17 +59,18 @@ settruecolor( FB *f )
 	f->hline = &hltc;
 	f->line = &genln;
 	f->putchar = &pctc;
+	f->sp8_convert = &sp8_to_tc;
 }
 
-static
-void
-setpackedpixel8 ( FB *f )
+static void
+setpackedpixel8( FB *f )
 {
-  f->putpixel = &ppspc;
-  f->getpixel = &gpspc;
-  f->hline = &hlspc;
-  f->line = &genln;
-  f->putchar = &pcspc;
+	f->putpixel = &ppspc;
+	f->getpixel = &gpspc;
+	f->hline = &hlspc;
+	f->line = &genln;
+	f->putchar = &pcspc;
+	f->sp8_convert = &sp8_to_sp8;
 }
 
 static void
@@ -75,6 +81,7 @@ setplanes1( FB *f )
 	f->hline = &plhl1;
 	f->line = &genln;
 	f->putchar = &plpc1;
+	f->sp8_convert = &sp8_to_p1;
 }
 
 static void
@@ -85,6 +92,7 @@ setplanes2( FB *f )
 	f->hline = &plhl2;
 	f->line = &genln;
 	f->putchar = &plpc2;
+	f->sp8_convert = &sp8_to_p2;
 }
 
 static void
@@ -95,6 +103,7 @@ setplanes4( FB *f )
 	f->hline = &plhl4;
 	f->line = &genln;
 	f->putchar = &plpc4;
+	f->sp8_convert = &sp8_to_p4;
 }
 
 static void
@@ -105,6 +114,7 @@ setplanes8( FB *f )
 	f->hline = &plhl8;
 	f->line = &genln;
 	f->putchar = &plpc8;
+	f->sp8_convert = &sp8_to_p8;
 }
 
 

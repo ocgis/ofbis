@@ -46,11 +46,18 @@ typedef	struct	bbpb
 	unsigned short	space[12];	/* reserved */
 } FBBLTPBLK;
 
+typedef struct fbblock
+{
+	void		*addr;		/* Pointer to start of data block */
+	int		width;		/* Width of block */
+	int		height;		/* Height of block */
+} FBBLOCK;
+
 typedef struct fbfont
 {
 	unsigned char	*data;
-	int 		width;
-	int 		height;
+	int		width;
+	int		height;
 } FBFONT;
 
 struct fbinf
@@ -78,6 +85,7 @@ struct fbinf
 	void		(*line)		(FB *f, unsigned short x1, unsigned short x2, unsigned short y1, unsigned short y2, unsigned long col);
 	void		(*bitblt)	(FB *f, FBBLTPBLK *fbb);
 	void		(*putchar)	(FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch);
+	void		(*sp8_convert)	(FB *f, FBBLOCK *srcblock, FBBLOCK *dstblock);
 };
 
 /* misc defines */
@@ -124,6 +132,8 @@ FBgetpixel( FB *f, unsigned short x, unsigned short y)
 #define FBbitblt(f,fbb)	FB_ATOMIC(f,(*(f->bitblt))(f,fbb))
 
 #define	FBputchar(f,x,y,fgcol,bgcol,ch)	FB_ATOMIC(f,(*(f->putchar))(f,x,y,fgcol,bgcol,ch))
+
+#define	FBchunk_to_native(f,srcblock,dstblock)	FB_ATOMIC(f,(*(f->sp8_convert))(f,srcblock,dstblock))
 
 /* screen settings functions */
 

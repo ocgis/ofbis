@@ -86,7 +86,7 @@ m4data_DATA = ofbis.m4
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES =  ofbis-config
+CONFIG_CLEAN_FILES =  ofbis-config ofbis.m4
 PROGRAMS =  $(noinst_PROGRAMS)
 
 
@@ -108,7 +108,7 @@ DATA =  $(m4data_DATA)
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 Makefile.in NEWS TODO acconfig.h aclocal.m4 config.guess config.h.in \
 config.sub configure configure.in install-sh ltconfig ltmain.sh missing \
-mkinstalldirs ofbis-config.in stamp-h.in
+mkinstalldirs ofbis-config.in ofbis.m4.in stamp-h.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -159,6 +159,8 @@ distclean-hdr:
 
 maintainer-clean-hdr:
 ofbis-config: $(top_builddir)/config.status ofbis-config.in
+	cd $(top_builddir) && CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+ofbis.m4: $(top_builddir)/config.status ofbis.m4.in
 	cd $(top_builddir) && CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
 
 mostlyclean-noinstPROGRAMS:
