@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(fbtst.c)
-AM_INIT_AUTOMAKE(ofbis, 0.0.6)
+OFBIS_VERSION=0.0.6
+AM_INIT_AUTOMAKE(ofbis, $OFBIS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
 dnl Set CFLAGS
@@ -34,4 +35,11 @@ AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(select strerror)
 
-AC_OUTPUT(src/Makefile doc/Makefile Makefile)
+AC_SUBST(OFBIS_VERSION)
+
+AC_OUTPUT([
+src/Makefile
+doc/Makefile
+Makefile
+ofbis-config
+])
