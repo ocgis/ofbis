@@ -113,10 +113,15 @@ FBc24_to_cnative( FB *f, u_int32_t col24 )
     return best_match;
   }
 
+  /*         0RRRRRGGGGGBBBBB
+     RRRRRRRRGGGGGGGGBBBBBBBB
+
+   */
+
   /* Truecolor */  
-  pval = (((cp[1] & ((1 << f->vinf.red.length) - 1)) << f->vinf.red.offset) |
-	  ((cp[2] & ((1 << f->vinf.green.length) - 1)) << f->vinf.green.offset) |
-	  ((cp[3] & ((1 << f->vinf.blue.length) - 1)) << f->vinf.blue.offset));
+  pval = ((((cp[1] >> (8 - f->vinf.red.length)) & ((1 << f->vinf.red.length) - 1)) << f->vinf.red.offset) |
+	  (((cp[2] >> (8 - f->vinf.green.length)) & ((1 << f->vinf.green.length) - 1)) << f->vinf.green.offset) |
+	  (((cp[3] >> (8 - f->vinf.blue.length)) & ((1 << f->vinf.blue.length) - 1)) << f->vinf.blue.offset));
   return (u_int32_t)pval;
 }
 
@@ -143,8 +148,8 @@ FBcnative_to_c24( FB *f, u_int32_t col )
   }
 
   /* Truecolour */  
-  colour = (((col >> f->vinf.red.offset) & ((1 << f->vinf.red.length) - 1)) |
-	    ((col >> f->vinf.green.offset) & ((1 << f->vinf.green.length) - 1)) |
-	    ((col >> f->vinf.blue.offset) & ((1 << f->vinf.blue.length) - 1)));
+  colour = ((((col >> f->vinf.red.offset) & ((1 << f->vinf.red.length) - 1)) << (8 - f->vinf.red.length)) |
+	    (((col >> f->vinf.green.offset) & ((1 << f->vinf.green.length) - 1)) << (8 - f->vinf.green.length)) |
+	    (((col >> f->vinf.blue.offset) & ((1 << f->vinf.blue.length) - 1)) << (8 - f->vinf.blue.length)));
   return colour;
 }
