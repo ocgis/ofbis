@@ -220,6 +220,37 @@ FBsetfuncs( FB *f )
     case FB_VISUAL_TRUECOLOR:
     case FB_VISUAL_DIRECTCOLOR:
       settruecolour(f);
+      {
+        FBCMAP *fbcmap;
+	int i;
+	
+	fbcmap = FBgetcmap(f);
+	
+	if(fbcmap == NULL)
+	  return;
+#if 0	
+	for(i=0;i<(1<<f->vinf.red.length);i++) {
+	  fbcmap->red[i] = i<<(16-f->vinf.red.length);
+	}
+	for(i=0;i<(1<<f->vinf.green.length);i++) {
+	  fbcmap->green[i] = i<<(16-f->vinf.green.length);
+	}
+	for(i=0;i<(1<<f->vinf.blue.length);i++) {
+	  fbcmap->blue[i] = i<<(16-f->vinf.blue.length);
+	}
+#else
+	for(i=0;i<32;i++) {
+	  fbcmap->red[i] = i<<11;
+	  fbcmap->green[i] = i<<11;
+	  fbcmap->blue[i] = i<<11;
+	}
+#endif	
+	fbcmap->start = 0;
+	fbcmap->end = 31;
+	fbcmap->len = 32;
+	FBputcmap(f, fbcmap);
+	FBfreecmap(fbcmap);
+      }
       break;
           
     case FB_VISUAL_PSEUDOCOLOR:
