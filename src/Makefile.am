@@ -1,5 +1,5 @@
 SUBDIRS = display_interleaved display_planes display_packed \
-	generic
+	display_vga generic
 
 # Include files goes into a special directory
 ofbisdir = @OSISINCLUDE@
@@ -19,6 +19,7 @@ libofbis_la_LIBADD = \
 	display_interleaved/libinterleaved.la \
 	display_planes/libplanes.la \
 	display_packed/libpacked.la \
+	display_vga/libvga.la \
 	generic/libgeneric.la
 
 # This is a bad versioning system, since much has changed

@@ -64,6 +64,7 @@ src/Makefile
 src/display_interleaved/Makefile
 src/display_planes/Makefile
 src/display_packed/Makefile
+src/display_vga/Makefile
 src/generic/Makefile
 doc/Makefile
 Makefile

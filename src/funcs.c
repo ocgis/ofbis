@@ -7,6 +7,7 @@
 #include "display_interleaved/funcs.h"
 #include "display_planes/funcs.h"
 #include "display_packed/funcs.h"
+#include "display_vga/funcs.h"
 /* #include "convert.h" */
 #include "funcs.h"
 
@@ -217,6 +218,26 @@ FBsetfuncs( FB *f )
     }
     break;
 
+  case FB_TYPE_VGA_PLANES:
+    switch(f->finf.visual) { /* FB_VISUAL_* */
+    case FB_VISUAL_PSEUDOCOLOR:
+      switch(f->vinf.bits_per_pixel) {
+      case 4:
+	vga_4_register_functions(f);
+        break;
+
+      default:
+        FBerror(FATAL, "FBsetfuncs: unsupported depth in pseudocolor mode (%d).",
+                f->vinf.bits_per_pixel);
+      }
+      break;
+
+    default:
+      FBerror(FATAL, "FBsetfuncs: unsupported visual type in VGA planes (%d).",
+              f->finf.visual);
+    }
+    break;
+    
   default:
     FBerror(FATAL, "FBsetfuncs: unsupported type (%d).",
             f->finf.type);
