@@ -1,4 +1,13 @@
-Latest version is 0.0.10
+Latest version is 0.1.0
+
+2000-02-17	Tomas Berndtsson
+		Completely new internal design for different display types.
+		32-bit truecolour mode supported.
+		Optimized bitblt for packed pixel modes.
+		Restore colours when switching back to an oFBis VT.
+		Always keep the current colourmap in the cmap struct.
+
+0.0.10
 
 1999-12-07	Tomas Berndtsson
 		Make characters non-transparent by default. Highest bit in the
