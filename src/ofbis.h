@@ -1,7 +1,7 @@
 /* Framebuffer library headers and prototypes */
 
-#ifndef _LIBFB_H_
-#define _LIBFB_H_
+#ifndef _OFBIS_H_
+#define _OFBIS_H_
 
 #include <sys/time.h>
 #include <linux/fb.h>
@@ -217,4 +217,4 @@ void    FBgetevent( FB *f, FBEVENT *ev );
 void    FBcheckevent( FB *f, FBEVENT *ev, struct timeval *tv );
 int     FBgetchar( FB *f );
 
-#endif
+#endif /* _OFBIS_H_ */
