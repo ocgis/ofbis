@@ -75,3 +75,46 @@ FBfreecmap( FBCMAP *fbcmap )
 	FBfree( fbcmap->blue );
 	FBfree( fbcmap );
 }
+
+unsigned long
+FBc24_to_cnative( FB *f, unsigned long col24 )
+{
+
+	if(f->finf.visual != FB_VISUAL_TRUECOLOR)
+		return col24;
+
+	switch(f->vinf.bits_per_pixel) {
+	case 16:
+	{
+		unsigned char *cp= (char *)&col24;
+		unsigned short pval = ((*++cp << 8 ) & 0xF800) |
+				      ((*++cp << 3 ) & 0x07E0) |
+				      ((*++cp >> 3 ) & 0x001F);
+		return pval;
+	}		
+		break;
+	default:
+		return col24;
+	}
+}
+
+unsigned long
+FBcnative_to_c24( FB *f, unsigned long col )
+{
+
+	if(f->finf.visual != FB_VISUAL_TRUECOLOR)
+		return col;
+
+	switch(f->vinf.bits_per_pixel) {
+	case 16:
+	{
+		unsigned long pval = ((col & 0xF800) << 8) |
+				     ((col & 0x07E0) << 5) |
+				     ((col & 0x001F) << 3);
+		return pval;
+	}		
+		break;
+	default:
+		return col;
+	}
+}

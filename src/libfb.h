@@ -151,6 +151,9 @@ FBCMAP  *FBgetcmap(FB *f);
 void    FBputcmap(FB *f, FBCMAP *fbcmap);
 void    FBfreecmap(FBCMAP *fbcmap);
 
+unsigned long FBc24_to_cnative(FB *f, unsigned long col24);
+unsigned long FBcnative_to_c24(FB *f, unsigned long col);
+
 /* bitblt functions */
 
 FBBLTPBLK       *FBgetbltpblk(FB *f);
