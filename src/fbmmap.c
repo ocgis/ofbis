@@ -10,7 +10,6 @@ FBmap(FB *f)
   off_t offset = 0;
 
   /* Some cards need a special mmap with offset */
-
   if(f->finf.accel == FB_ACCEL_SUN_CGSIX)
     offset = 0x70000000 + 0x16000;  
 
