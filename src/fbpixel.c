@@ -67,11 +67,8 @@ void
 pptc( FB *f, unsigned short x, unsigned short y, unsigned long col )
 {
   register unsigned short	*pixel=f->sbuf+((y*f->vinf.xres_virtual)+x);
-  register unsigned char	*cp= (char *)&col;
 
-	*pixel = (( *cp++ << 8 ) & 0xF800 ) |
-		 (( *++cp << 3 ) & 0x07E0 ) |
-		 (( *++cp >> 3 ) & 0x001F );
+	*pixel = (unsigned short)col;
 }
 
 /*

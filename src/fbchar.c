@@ -155,12 +155,6 @@ pctc(FB *f,
   register unsigned short *base = ((unsigned short *)f->sbuf) + 
 				   (x + y * f->vinf.xres_virtual);
   register unsigned char *chardata = &f->font->data[f->font->height * ch];
-  unsigned char *cp= (char *)&fgcol;
-  unsigned short tc_col;
-  
-  tc_col = (( *cp++ << 8 ) & 0xF800 ) |
-	   (( *++cp << 3 ) & 0x07E0 ) |
-	   (( *++cp >> 3 ) & 0x001F );
 
   for (row = 0; row < f->font->height; row++, chardata++) {
     register unsigned char data = *chardata;
@@ -168,7 +162,7 @@ pctc(FB *f,
 
     for (p = 0; p < f->font->width; p++) {
       if (data & 0x80) {
-	*base = tc_col;
+	*base = (unsigned short)fgcol;
       }
 
       base++;

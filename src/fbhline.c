@@ -105,14 +105,10 @@ hltc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned lo
 	register unsigned short	x = MIN(x1,x2);
 	register unsigned short	j = MAX(x1,x2);
 	register unsigned short	*pixel=f->sbuf+((y*f->vinf.xres_virtual)+x);
-		 unsigned char	*cp= (char *)&col;
-	register unsigned short	pval = ( ( *cp++ << 8 ) & 0xF800 ) |
-				( ( *++cp << 3 ) & 0x07E0 ) |
-				( ( *++cp >> 3 ) & 0x001F );
 
 	while ( x++ <= j )
 	{
-		*pixel++ = pval;
+		*pixel++ = (unsigned short)col;
 	}
 }
 
