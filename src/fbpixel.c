@@ -74,6 +74,29 @@ pptc( FB *f, unsigned short x, unsigned short y, unsigned long col )
 		 (( *++cp >> 3 ) & 0x001F );
 }
 
+/*
+** Description
+** Put pixel to static pseudocolor fb.
+**
+** To be done
+** This one works for a colourdepth of 8 (one byte per pixel) only.
+** Maybe it needs to be fixed for larger colourdepths.
+**
+** 1998-08-06 CG
+*/
+void
+ppspc (FB *f,
+       unsigned short x,
+       unsigned short y,
+       unsigned long col)
+{
+  register unsigned char *pixel =
+    (unsigned char *)f->sbuf + ((y * f->vinf.xres_virtual)+x);
+
+  *pixel = (unsigned char)col;
+}
+
+
 void
 plpp1( FB *f, unsigned short x, unsigned short y, unsigned long col )
 {
@@ -201,6 +224,29 @@ gptc( FB *f, unsigned short x, unsigned short y )
 
 	return col;
 }
+
+
+/*
+** Description
+** Get pixel from static pseudocolor fb.
+**
+** To be done
+** This one works for a colourdepth of 8 (one byte per pixel) only.
+** Maybe it needs to be fixed for larger colourdepths.
+**
+** 1998-08-06 CG
+*/
+unsigned long
+gpspc (FB *f,
+       unsigned short x,
+       unsigned short y)
+{
+  register unsigned char *pixel =
+    (unsigned char *)f->sbuf + ((y * f->vinf.xres_virtual)+x);
+
+  return (unsigned long)*pixel;
+}
+
 
 unsigned long
 plgp1( FB *f, unsigned short x, unsigned short y )

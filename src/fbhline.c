@@ -116,6 +116,33 @@ hltc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned lo
 	}
 }
 
+
+/*
+** Description
+** Draw a horizontal line to a static psuedocolor fb
+**
+** To be done
+** This function only works for a colourdepth of 8 (one byte per pixel) and
+** needs to be updated for larger colourdepths.
+*/
+void
+hlspc(FB *f,
+      unsigned short x1,
+      unsigned short x2,
+      unsigned short y,
+      unsigned long col)
+{
+  register unsigned short	x = MIN(x1,x2);
+  register unsigned short	j = MAX(x1,x2);
+  register unsigned char	*pixel =
+    (char *)f->sbuf + ((y*f->vinf.xres_virtual) + x);
+  
+  while (x++ <= j) {
+    *pixel++ = (unsigned char)col;
+  }
+}
+
+
 void
 plhl1( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col )
 {

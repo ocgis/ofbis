@@ -127,6 +127,45 @@ pctc( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned l
 {
 }
 
+
+/*
+** Description
+** Put a character to a static pseudocolour fb
+**
+** To be done
+** Fix for other colourdepths than 8 (one byte per pixel).
+*/
+void
+pcspc (FB *f,
+       unsigned short x,
+       unsigned short y,
+       unsigned long fgcol,
+       unsigned long bgcol,
+       unsigned char ch )
+{
+  int row;
+  register unsigned char * base =
+    (unsigned char*)f->sbuf + x + y * f->vinf.xres_virtual;
+  register unsigned char *chardata = &f->font->data [f->font->height * ch];
+
+  for (row = 0; row < f->font->height; row++, chardata++) {
+    unsigned char data = *chardata;
+    int           p;
+
+    for (p = 0; p < 8; p++) {
+      if (data & 0x80) {
+	*base = fgcol;
+      }
+
+      base++;
+      data <<= 1;
+    }
+
+    base += f->vinf.xres_virtual - 8;
+  }
+}
+
+
 void
 plpc1( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch )
 {

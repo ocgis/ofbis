@@ -11,6 +11,7 @@ void	i2hl2( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsig
 void	i2hl4( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
 void	i2hl8( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
 void	hltc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
+void	hlspc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
 void	plhl1( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
 void	plhl2( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );
 void	plhl4( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col );

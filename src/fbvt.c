@@ -134,7 +134,7 @@ FBVTopen(FB *f)
 	originaltty = vts.v_active;
 
 	/* Switch to new VT */
-
+	
 	if ( ioctl( f->tty, VT_ACTIVATE, f->ttyno ) == -1 )
 	{
 		FBerror( FATAL | SYSERR, "FBVTopen: couldn't switch to VT %d", f->ttyno);
@@ -175,6 +175,7 @@ FBVTopen(FB *f)
 
 	/* Disable cursor */
 
+	
 	if ( ioctl( f->tty, KDSETMODE, KD_GRAPHICS ) == -1 )
 	{
 		FBerror( FATAL | SYSERR, "FBVTopen: Couldn't set keyboard graphics mode on VT %d", f->ttyno);

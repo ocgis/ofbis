@@ -56,6 +56,17 @@ settruecolor( FB *f )
 	f->putchar = &pctc;
 }
 
+static
+void
+setstaticpseudocolor ( FB *f )
+{
+  f->putpixel = &ppspc;
+  f->getpixel = &gpspc;
+  f->hline = &hlspc;
+  f->line = &genln;
+  f->putchar = &pcspc;
+}
+
 static void
 setplanes1( FB *f )
 {
@@ -116,15 +127,32 @@ FBsetfuncs( FB *f )
 	}
 	else if ( f->finf.type == FB_TYPE_PACKED_PIXELS )
 	{
-		switch (f->finf.visual)
-		{
-			case FB_VISUAL_MONO01: setinterleave1(f); break;	/* need to fix colours here? */
-			case FB_VISUAL_MONO10: setinterleave1(f); break;
-			case FB_VISUAL_PSEUDOCOLOR: setinterleave1(f); break;
-			case FB_VISUAL_TRUECOLOR: settruecolor(f); break;
-			default: FBerror( FATAL, "FBsetfuncs: unsupported "
-						"visual type in packed pixels.");
-		}
+	  switch (f->finf.visual) {
+	  case FB_VISUAL_MONO01:
+	    setinterleave1(f);
+	    break;	/* need to fix colours here? */
+	  
+	  case FB_VISUAL_MONO10:
+	    setinterleave1(f);
+	    break;
+
+	  case FB_VISUAL_PSEUDOCOLOR:
+	    setinterleave1(f);
+	    break;
+
+	  case FB_VISUAL_TRUECOLOR:
+	    settruecolor(f);
+	    break;
+	  
+	  case FB_VISUAL_STATIC_PSEUDOCOLOR:
+	    setstaticpseudocolor (f);
+	    break;
+
+	  default:
+	    FBerror( FATAL, "FBsetfuncs: unsupported "
+		     "visual type in packed pixels (0x%x).",
+		     f->finf.visual);
+	  }
 	}
 	else if ( f->finf.type == FB_TYPE_PLANES )
 	{

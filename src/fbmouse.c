@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 #include "fbmouse.h"
@@ -9,23 +10,28 @@
 int	msefd;
 int	calls = 0;
 
+/*
+** Description
+** Open the mouse device.
+**
+** 1998-08-06 CG
+*/
 void
 FBmouseopen( void )
 {
-	if ( ++calls > 1 )
-	{
-		return;
-	}
-
-	if ( ( msefd = open ( "/dev/mouse", O_RDWR | O_NDELAY )) == -1 )
-	{
-		FBerror( FATAL | SYSERR, "FBmouseopen: Error opening /dev/mouse" );
-	}
-
-	/* Flush input */
-
-	tcflush( msefd, TCIFLUSH );
+  if ( ++calls > 1 ) {
+    return;
+  }
+  
+  if ( ( msefd = open ( "/dev/mouse", O_RDWR | O_NDELAY )) == -1 ) {
+    fprintf (stderr, "FBmouseopen: Error opening /dev/mouse");
+  } else {
+    /* Flush input */
+    
+    tcflush( msefd, TCIFLUSH );
+  }
 }
+
 
 int
 FBmouseget( void )

@@ -13,57 +13,57 @@
 #include "fbkbd.h"
 #include "fbmouse.h"
 
+
+/*
+** Description
+** Get one keyboard or mouse event
+**
+** Revision history
+** 1998-08-06 CG
+**            Added check for uninitialized mouse device handle.
+*/
 void
-FBgetevent( FB *f, FBEVENT *ev )
-{
-	int interrupted;
-	fd_set	in;
+FBgetevent (FB *f, FBEVENT *ev) {
+  int interrupted;
+  fd_set	in;
+  
+  FD_ZERO (&in);
+  FD_SET (f->tty, &in);
 
-	FD_ZERO( &in );
-	FD_SET( f->tty, &in );
-	if ( f->sbuf != f->sbak )
-	{
-		FD_SET( msefd, &in );
-		tcflush( msefd, TCIFLUSH );
+  if ((f->sbuf != f->sbak) && (msefd != -1)) {
+    FD_SET( msefd, &in );
+    tcflush( msefd, TCIFLUSH );
+  }
+  
+  do {
+    interrupted = FALSE;
+    
+    if (select (FD_SETSIZE, &in, NULL, NULL, NULL) == -1) {
+      if (errno==EINTR) {
+	interrupted = TRUE;
+
+	if (msefd != -1) {
+	  if (f->sbuf == f->sbak) {
+	    FD_CLR( msefd, &in );
+	  } else {
+	    FD_SET( msefd, &in );
+	    tcflush( msefd, TCIFLUSH );
+	  }
 	}
+      } else {
+	FBerror( FATAL | SYSERR, "FBgetevent: select() returned" );
+      }
+    }
+  } while ( interrupted );
 
-	do
-	{
-		interrupted = FALSE;
-
-		if ( select( FD_SETSIZE, &in, NULL, NULL, NULL ) == -1)
-		{
-			if (errno==EINTR)
-			{
-				interrupted = TRUE;
-				if ( f->sbuf == f->sbak )
-				{
-					FD_CLR( msefd, &in );
-				}
-				else
-				{
-					FD_SET( msefd, &in );
-					tcflush( msefd, TCIFLUSH );
-				}
-			}
-			else
-			{
-				FBerror( FATAL | SYSERR, "FBgetevent: select() returned" );
-			}
-		}
-	} while ( interrupted );
-
-	if ( FD_ISSET( f->tty, &in ) )
-	{
-		ev->type = FBKeyEvent;
-		FBprocesskey( f, &ev->key );
-	}
-	else if ( FD_ISSET( msefd, &in ) )
-	{
-		ev->type = FBMouseEvent;
-		FBprocessmouse( &ev->mouse );		
-/*		printf("buttons: %d x: %d y: %d\n",ev->mouse.buttons, ev->mouse.x, ev->mouse.y ); */
-	}
+  if (FD_ISSET (f->tty, &in)) {
+    ev->type = FBKeyEvent;
+    FBprocesskey (f, &ev->key);
+  } else if (FD_ISSET (msefd, &in)) {
+    ev->type = FBMouseEvent;
+    FBprocessmouse (&ev->mouse);		
+    /*		printf("buttons: %d x: %d y: %d\n",ev->mouse.buttons, ev->mouse.x, ev->mouse.y ); */
+  }
 }
 
 void
@@ -106,13 +106,12 @@ FBcheckevent( FB *f, FBEVENT *ev, struct timeval *tv )
 int
 FBgetchar( FB *f )
 {
-	FBEVENT	ev;
+  FBEVENT	ev;
+  
+  do {
+    FBgetevent( f, &ev );
+  } while ((ev.type != FBKeyEvent) ||
+	   ((ev.key.keycode & 0x80)==0x80));
 
-	do
-	{
-		FBgetevent( f, &ev );
-	} while ( ( ev.type != FBKeyEvent ) ||
-		  ( ( ev.key.keycode & 0x80)==0x80) );
-
-	return((int)ev.key.ascii);
+  return((int)ev.key.ascii);
 }
