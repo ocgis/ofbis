@@ -36,7 +36,9 @@ FBopen( const char *fbname, unsigned short opts )
     }
   }
 
-  if ( (f->fb = open( fbname, O_RDONLY/*WR*/ | O_NONBLOCK )) == -1 ) {
+  /* Open the framebuffer device for read only */
+
+  if ( (f->fb = open( fbname, O_RDONLY | O_NONBLOCK )) == -1 ) {
     FBerror( FATAL | SYSERR, "FBopen: open failed on %s", fbname );
   }
   
@@ -58,8 +60,9 @@ FBopen( const char *fbname, unsigned short opts )
   /* Setup fontinfo */
   
   FBfontopen(f);
-  
-  /*f->fb=open(fbname,O_RDWR);*/
+
+  /* Open the framebuffer device for read and write */
+
   if ( (f->fb = open( fbname, O_RDWR )) == -1 ) {
     FBerror( FATAL | SYSERR, "FBopen: open failed on %s", fbname );
   }
@@ -75,8 +78,10 @@ FBopen( const char *fbname, unsigned short opts )
   f->vinf.xoffset = 0;
   f->vinf.yoffset = 0;
   f->vinf.vmode &= ~FB_VMODE_YWRAP;
-  
+
   /* Update screen info */
+
+  f->cmap = NULL;
   
   FBputvar(f);
   
@@ -117,6 +122,14 @@ FBclose( FB *f ) {
   
   if ( close ( f->fb ) == -1 ) {
     FBerror( WARNING | SYSERR, "FBclose: close fb failed" );
+  }
+
+  /* Free the internal palette. */
+  if(f->cmap) {
+    FBfree(f->cmap->red);
+    FBfree(f->cmap->green);
+    FBfree(f->cmap->blue);
+    FBfree(f->cmap);
   }
   
   /* Free FB */
