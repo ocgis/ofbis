@@ -220,7 +220,7 @@ void sp8_to_i8( FB *f, FBBLOCK *srcblock, FBBLOCK *dstblock )
 {
 #ifdef mc68020 /* Use optimized m68k assembler */
   unsigned char *srcptr = (unsigned char *)srcblock->addr;
-  unsigned char *dstptr = (unsigned short *)dstblock->addr;
+  unsigned short *dstptr = (unsigned short *)dstblock->addr;
   int padded_width = (srcblock->width+15) & 0xfffffff0;
 
   dstblock->width = srcblock->width;
