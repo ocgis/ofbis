@@ -1,6 +1,6 @@
 # Include files goes into a special directory
 ofbisdir = @OSISINCLUDE@
-ofbis_HEADERS = ofbis.h
+ofbis_HEADERS = ofbis.h ofbis_keyboard.h
 
 # Make a shared library using libtool
 lib_LTLIBRARIES = libofbis.la
