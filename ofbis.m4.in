@@ -1,5 +1,6 @@
 # Configure paths for oFBis
 # Christer Gustavsson 98-09-20
+# Tomas Berndtsson 1999-12-12, added AM_CHECK_LIBOFBIS
 
 dnl AM_PATH_OFBIS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, MODULES]]]])
 dnl Test for oFBis, and define OFBIS_CFLAGS and OFBIS_LIBS
@@ -69,4 +70,66 @@ AC_ARG_ENABLE(ofbistest, [  --disable-ofbistest       Do not try to compile and 
   fi
   AC_SUBST(OFBIS_CFLAGS)
   AC_SUBST(OFBIS_LIBS)
+])
+
+
+dnl AM_CHECK_LIBOFBIS(MINIMUM-VERSION, [ACTION-IF-FOUND, [ACTION-IF-NOT-FOUND]])
+dnl Simplifies for other packages to check for libofbis.
+
+AC_DEFUN(AM_CHECK_LIBOFBIS,
+[
+dnl AC_MSG_CHECKING([for libofbis version >= $1... ])
+if test x$with_ofbis = xyes ; then
+  AC_MSG_ERROR([
+*** Directory must be specified for --with-ofbis])
+fi
+
+if test x$with_ofbis = x ; then 
+dnl Look for separately installed ofbis
+
+  AM_PATH_OFBIS($1, ifelse([$2], , :, [$2]),
+    [ifelse([$3], ,
+     AC_MSG_ERROR([
+*** oFBis $1 or better is required. The latest version of oFBis
+*** is always available from ftp://ftp.nocrew.org/pub/osis/.])
+     , [$3])],
+    ofbis)
+
+  ofbis_cflags=$OFBIS_CFLAGS
+  ofbis_libs=$OFBIS_LIBS
+else
+dnl Use uninstalled ofbis (assume they got the version right)
+
+  if test -x $with_ofbis/ofbis-config ; then 
+
+    ofbis_release=`$with_ofbis/ofbis-config --version | sed 's%\\.[[0-9]]*$%%'`
+
+dnl canonicalize relative paths
+    case $with_ofbis in 
+      /*)
+        ofbis_dir=$with_ofbis
+        ;;
+      *)
+        ofbis_dir="\$(top_builddir)/$with_ofbis"
+        ;;
+    esac
+
+    OFBIS_CFLAGS="-I$ofbis_dir"
+    OFBIS_LIBS=$ofbis_dir/libofbis.la
+
+    ifelse([$2], , :, [$2])
+  else
+    OFBIS_CFLAGS=""
+    OFBIS_LIBS=""
+    ifelse([$3], ,
+      AC_MSG_ERROR([oFBis directory ($with_ofbis) not present or not configured])
+      , [$3])
+  fi
+
+  AC_SUBST(OFBIS_CFLAGS)
+  AC_SUBST(OFBIS_LIBS)
+fi
+
+dnl AC_MSG_RESULT(found)
+
 ])
