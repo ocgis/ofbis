@@ -154,7 +154,8 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
       table = K_SHIFTTAB;
     }
   } else if (ModifierDown (Mode_Alt)) {
-    table = K_ALTTAB;
+    /* With K_ALTTAB, vt switching doesn't work */
+    table = K_NORMTAB; /*K_ALTTAB;*/ 
   } else if (ModifierDown (Mode_Caps)) {
     table = K_SHIFTTAB; /* Where is the capsmap? */
   } else {
@@ -241,8 +242,12 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   /* Console switching */
 
   /*
-  fprintf (stderr, "ofbis: fbkbd.c: FBProcesskey: state=0x%x\n", ev->state);
-  */
+  fprintf (stderr, 
+	   "ofbis: fbkbd.c: FBProcesskey: state=0x%x\n"
+	   "                              ascii=0x%x\n"
+	   "                              keycode=0x%x\n", 
+	   ev->state, ev->ascii, ev->keycode);
+	   */
 
   if ((ModifierDown (Mode_Alt) && ModifierDown (Mode_Ctrl)) &&
        ((keycode>=K_F1 ) && (keycode <= K_F10)))
@@ -259,8 +264,10 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
       FBerror( WARNING | SYSERR, "FBprocesskey: VT switch failed" );
     }
   }
-  /*printf("State after is %x\n", state); 
-    printf("Got ascii %c %x\n", ev->ascii, (int) ev->ascii);*/
+  /* 
+     printf("State after is %x\n", state); 
+     printf("Got ascii %c %x\n", ev->ascii, (int) ev->ascii); 
+     */
 }
 
 void
