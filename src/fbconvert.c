@@ -37,6 +37,177 @@ void sp8_to_p8( FB *f, FBBLOCK *srcblock, FBBLOCK *dstblock )
 {
 }
 
+/* Optimized m68k assembler c2p routine
+ *
+ * Copyright 1998 Johan Klockars <rand@cd.chalmers.se>
+ *
+ * Slightly modified by Tomas to fit oFBis.
+ * MUST be compiled with -fomit-frame-pointer!!
+ *
+ */
+#ifdef mc68020
+static void debitplane(char *chunky, long chunky_width, 
+		       long width, long height, 
+		       short *planar, long planar_width)
+{
+asm("	moveml	%%d2-%%d7/%%a2-%%a5,%%sp@-\n"
+    "	movel	%%sp@(44),%%a0\n"
+    "	movel	%%sp@(48),%%d0\n"
+    "	movel	%%sp@(52),%%d1\n"
+    "	movel	%%sp@(56),%%d2\n"
+    "	movel	%%sp@(60),%%a1\n"
+    "	exg	%%d0,%%d1\n"
+    "	movew	%%d2,%%sp@-\n"
+    "	subw	%%d0,%%d1\n"
+    "	movew	%%d1,%%sp@-\n"
+    "	movew	%%d0,%%d3\n"
+    "	lsrw	#4,%%d0\n"
+    "	movew	%%d0,%%a4\n"
+    "	movew	%%a4,%%a5\n"
+    "	andw	#0x000f,%%d3\n"
+    "	movew	%%d3,%%sp@-\n"
+    "line:\n"
+    "	movew	%%a5,%%a4\n"
+    "	movel	%%a1,%%sp@-\n"
+    "	cmpw	#0,%%a4\n"
+    "	beq	loop_end\n"
+    "loop:\n"
+    "	movel	%%a0@+,%%d0\n"
+    "	movel	#0x00ff00ff,%%d4\n"
+    "	movel	%%a0@+,%%d1\n"
+    "	moveq	#8,%%d5\n"
+    "	movel	%%a0@+,%%d2\n"
+    "#	movel	%%d0,%%d6\n"
+    "	movel	%%a0@+,%%d3\n"
+    "	bra	loop_start\n"
+    "pass_2:\n"
+    "	movel	#0x33333333,%%d4\n"
+    "	swap	%%d1\n"
+    "	movel	%%d1,%%d7\n"
+    "	movew	%%d0,%%d1\n"
+    "	swap	%%d1\n"
+    "	movew	%%d7,%%d0\n"
+    "	swap	%%d3\n"
+    "	movel	%%d3,%%d7\n"
+    "	movew	%%d2,%%d3\n"
+    "	swap	%%d3\n"
+    "	movew	%%d7,%%d2\n"
+    "	exg	%%d1,%%d2\n"
+    "loop_start:\n"
+    "	movel	%%d2,%%d7\n"
+    "	lsrl	%%d5,%%d7\n"
+    "	eorl	%%d0,%%d7\n"
+    "	andl	%%d4,%%d7\n"
+    "	eorl	%%d7,%%d0\n"
+    "	lsll	%%d5,%%d7\n"
+    "	eorl	%%d7,%%d2\n"
+    "	movel	%%d3,%%d7\n"
+    "	lsrl	%%d5,%%d7\n"
+    "	eorl	%%d1,%%d7\n"
+    "	andl	%%d4,%%d7\n"
+    "	eorl	%%d7,%%d1\n"
+    "	lsll	%%d5,%%d7\n"
+    "	eorl	%%d7,%%d3\n"
+    "	lsrw	#1,%%d5\n"
+    "	movel	%%d4,%%d7\n"
+    "	lsll	%%d5,%%d4\n"
+    "	eorl	%%d7,%%d4\n"
+    "	movel	%%d1,%%d7\n"
+    "	lsrl	%%d5,%%d7\n"
+    "	eorl	%%d0,%%d7\n"
+    "	andl	%%d4,%%d7\n"
+    "	eorl	%%d7,%%d0\n"
+    "	lsll	%%d5,%%d7\n"
+    "	eorl	%%d7,%%d1\n"
+    "	movel	%%d3,%%d7\n"
+    "	lsrl	%%d5,%%d7\n"
+    "	eorl	%%d2,%%d7\n"
+    "	andl	%%d4,%%d7\n"
+    "	eorl	%%d7,%%d2\n"
+    "	lsll	%%d5,%%d7\n"
+    "	eorl	%%d7,%%d3\n"
+    "	lsrw	#1,%%d5\n"
+    "	bne	pass_2\n"
+    "	movew	%%d3,%%a1@+\n"
+    "	exg	%%d1,%%d2\n"
+    "	movew	%%d1,%%a1@+\n"
+    "	swap	%%d3\n"
+    "	movew	%%d2,%%a1@+\n"
+    "	swap	%%d1\n"
+    "	movew	%%d0,%%a1@+\n"
+    "	swap	%%d2\n"
+    "	movew	%%d3,%%a1@+\n"
+    "	swap	%%d0\n"
+    "	movew	%%d1,%%a1@+\n"
+    "	subqw	#1,%%a4\n"
+    "	movew	%%d2,%%a1@+\n"
+    "	movew	%%d0,%%a1@+\n"
+    "	cmpw	#0,%%a4\n"
+    "	bne	loop\n"
+    "loop_end:\n"
+    "	movew	%%sp@(4),%%d6\n"
+    "	beq	next\n"
+    "	moveq	#16,%%d5\n"
+    "	subw	%%d6,%%d5\n"
+    "	subqw	#1,%%d6\n"
+    "inner2:	\n"
+    "	moveb	%%a0@+,%%d7\n"
+    "	lslb	#5,%%d7\n"
+    "	addxw	%%d0,%%d0\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d1,%%d1\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d2,%%d2\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d3,%%d3\n"
+    "	dbra	%%d6,inner2\n"
+    "	lslw	%%d5,%%d0\n"
+    "	lslw	%%d5,%%d1\n"
+    "	lslw	%%d5,%%d2\n"
+    "	lslw	%%d5,%%d3\n"
+    "	swap	%%d3\n"
+    "	movew	%%d2,%%d3\n"
+    "	swap	%%d1\n"
+    "	movew	%%d0,%%d1\n"
+    "	movel	%%d3,%%a2\n"
+    "	movel	%%d1,%%a3\n"
+    "	movew	%%sp@(4),%%d6\n"
+    "	subw	%%d6,%%a0\n"
+    "	subqw	#1,%%d6\n"
+    "inner1:\n"
+    "	moveb	%%a0@+,%%d7\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d0,%%d0\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d1,%%d1\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d2,%%d2\n"
+    "	lslb	#1,%%d7\n"
+    "	addxw	%%d3,%%d3\n"
+    "	dbra	%%d6,inner1\n"
+    "	movel	%%a2,%%a1@+\n"
+    "	lslw	%%d5,%%d0\n"
+    "	lslw	%%d5,%%d1\n"
+    "	movel	%%a3,%%a1@+\n"
+    "	lslw	%%d5,%%d2\n"
+    "	lslw	%%d5,%%d3\n"
+    "	movew	%%d3,%%a1@+\n"
+    "	movew	%%d2,%%a1@+\n"
+    "	movew	%%d1,%%a1@+\n"
+    "	movew	%%d0,%%a1@+\n"
+    "next:\n"
+    "	movel	%%sp@+,%%a1\n"
+    "	addl	%%sp@(64+6),%%a1\n"
+    "	addw	%%sp@(2),%%a0\n"
+    "	subqw	#1,%%sp@(4)\n"
+    "	bne	line\n"
+    "	addql	#6,%%sp\n"
+    "	moveml	%%sp@+,%%d2-%%d7/%%a2-%%a5"
+    : "=m" (planar)
+    : "m" (chunky), "m" (chunky_width), "m" (width), "m" (height), "m" (planar_width));
+}
+#endif /* mc68020 */
+
 /* 1998-10-27 Tomas Berndtsson
  *
  * Convert 8-bit static pseudocolour to 
@@ -49,102 +220,17 @@ void sp8_to_i8( FB *f, FBBLOCK *srcblock, FBBLOCK *dstblock )
 {
 #ifdef mc68020 /* Use optimized m68k assembler */
   unsigned char *srcptr = (unsigned char *)srcblock->addr;
-  unsigned char *dstptr = (unsigned char *)dstblock->addr;
+  unsigned char *dstptr = (unsigned short *)dstblock->addr;
   int padded_width = (srcblock->width+15) & 0xfffffff0;
-  int extra = padded_width - srcblock->width;
-  int y, width = srcblock->width;
-  void *table;
-
-  table = FBalloc(65536L);
 
   dstblock->width = srcblock->width;
   dstblock->height = srcblock->height;
 
-  /* Copy and pad chunk data to even 16 */
-  for(y = 0 ; y < srcblock->height ; y++) {
-    memcpy(dstptr, srcptr, width);
-    memset(dstptr+width, 0, extra);
-    srcptr += width;
-    dstptr += width+extra;
-  }
+  debitplane(srcptr, srcblock->width,
+	     srcblock->width, srcblock->height,
+	     dstptr, padded_width);
 
-#if 0
-  m68k_sp8_to_i8_clrtab(table);
-  m68k_sp8_to_i8_mktab(table);
-  m68k_sp8_to_i8_ctobp(table, srcblock->addr, dstblock->addr, 
-		      padded_width*srcblock->height);
-#else
-  /* Clear table */
-  asm ("	clrl   %%d0\n"
-       "	movel  %0,%%a0\n"
-       "	movew  #4095,%%d1\n"
-       "0:	movel  %%d0,%%a0@+\n"
-       "	movel  %%d0,%%a0@+\n"
-       "	movel  %%d0,%%a0@+\n"
-       "	movel  %%d0,%%a0@+\n"
-       "	dbra   %%d1,0b"
-       : 
-       : "m" (table)
-       : "d0","d1","a0");
-
-  /* Make table */
-  asm ("	movel  %0,%%a0\n"
-       "	clrl   %%d0\n"
-       "0:	moveb  %%d0,%%d1\n"
-       "	moveq  #7,%%d3\n"
-       "1:	movel  %%a0,%%a1\n"
-       "	lsrb   #1,%%d1\n"
-       "	jcc    3f\n"
-       "	movew  #0x8000,%%d2\n"
-       "2:	movew  %%d2,%%a1@\n"
-       "	addaw  #256*16,%%a1\n"
-       "	lsrw   #1,%%d2\n"
-       "	jne    2b\n"
-       "3:	addql  #2,%%a0\n"
-       "	dbra   %%d3,1b\n"
-       "	addqb  #1,%%d0\n"
-       "	jne    0b"
-       : 
-       : "m" (table)
-       : "d0", "d1", "d2", "d3", "a0", "a1");
-	
-
-  /* Convert chunk to bitplanes */
-  asm ("	movel  %0,%%a4\n"
-       "	movel  %1,%%a0\n"
-       "	movel  %2,%%a1\n"
-       "	movel  %3,%%d0\n"
-       "	lsrl   #4,%%d0\n"
-       "0:	movel  %%a4,%%a2\n"
-       "	clrl   %%d3\n"
-       "	clrl   %%d4\n"
-       "	clrl   %%d5\n"
-       "	clrl   %%d6\n"
-       "	moveq  #15,%%d1\n"
-       "1:	clrl   %%d2\n"
-       "	moveb  %%a0@+,%%d2\n"
-       "	addl   %%d2,%%d2\n"
-       "	lea    %%a2@(%%d2:l:8),%%a3\n"
-       "	orl    %%a3@+,%%d3\n"
-       "	orl    %%a3@+,%%d4\n"
-       "	orl    %%a3@+,%%d5\n"
-       "	orl    %%a3@+,%%d6\n"
-       "	addaw  #256*16,%%a2\n"
-       "	dbra   %%d1,1b\n"
-       "	movel  %%d3,%%a1@+\n"
-       "	movel  %%d4,%%a1@+\n"
-       "	movel  %%d5,%%a1@+\n"
-       "	movel  %%d6,%%a1@+\n"
-       "	subql  #1,%%d0\n"
-       "	jgt    0b"
-       :
-       : "m" (table), "m" (dstblock->addr), "m" (dstblock->addr), "d" (padded_width*srcblock->height)
-       : "d0","d1","d2","d3","d4","d5","d6", "a0","a1","a2","a3","a4");
-#endif
-
-  FBfree(table);
-
-#else /* General C function */
+#else /* General _slow_ C function */
 
   unsigned char *srcptr = (unsigned char *)srcblock->addr;
   unsigned short *dstptr = (unsigned short *)dstblock->addr;
