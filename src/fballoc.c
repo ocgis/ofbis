@@ -29,17 +29,17 @@ FBdebugreport( void )
   FBListNode      ln;
   FBMD            *fbmd;
 
-  printf("libfb: Memory leaks:\n");
+  printf("ofbis: Memory leaks:\n");
   if (FBListEmpty(md))
   {
-    printf("libfb: No leaks.\n");
+    printf("ofbis: No leaks.\n");
     return;
   }
   while (!FBListEmpty(md))
   {
     ln=FBListGetAnyNode(md);
     fbmd=ln->val;
-    fprintf(stderr,"libfb: Address %p : %ld bytes at line %d of %s\n",fbmd->start,fbmd->size,fbmd->line,fbmd->file);
+    fprintf(stderr,"ofbis: Address %p : %ld bytes at line %d of %s\n",fbmd->start,fbmd->size,fbmd->line,fbmd->file);
     md=FBListRemoveNode(md,ln->key);
     free(fbmd->start);
   }

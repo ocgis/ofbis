@@ -35,7 +35,12 @@ AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(select strerror)
 
+dnl Directory to install header files in.
+OSISINCLUDE=${includedir}/osis
+
+dnl Export variables.
 AC_SUBST(OFBIS_VERSION)
+AC_SUBST(OSISINCLUDE)
 
 AC_OUTPUT([
 src/Makefile

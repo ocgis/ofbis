@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "libfb.h"
+#include "ofbis.h"
 #include "fballoc.h"
 #include "fberror.h"
 #include "fbmmap.h"

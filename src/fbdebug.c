@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "libfb.h"
+#include "ofbis.h"
 
 void
 FBfinfdump ( FB *f )

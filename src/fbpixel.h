@@ -1,7 +1,7 @@
 #ifndef _FBPIXEL_H_
 #define _FBPIXEL_H_
 
-#include "libfb.h"
+#include "ofbis.h"
 
 /* Put pixel functions */
 

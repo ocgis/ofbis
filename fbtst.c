@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include "src/libfb.h"
+#include "src/ofbis.h"
 
 #define BLITTEST
 #define CHARTEST

@@ -1,4 +1,4 @@
-#include "libfb.h"
+#include "ofbis.h"
 #include "fbpixel.h"
 #include "fberror.h"
 

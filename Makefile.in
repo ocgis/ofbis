@@ -67,6 +67,7 @@ LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 NM = @NM@
 OFBIS_VERSION = @OFBIS_VERSION@
+OSISINCLUDE = @OSISINCLUDE@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
@@ -75,7 +76,7 @@ SUBDIRS = src doc
 
 noinst_PROGRAMS = fbtst
 fbtst_SOURCES = fbtst.c
-fbtst_LDADD = src/.libs/libfb.a
+fbtst_LDADD = src/.libs/libofbis.a
 
 EXTRA_DIST = CREDITS DESIGN VERSION
 
@@ -95,7 +96,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 fbtst_OBJECTS =  fbtst.o
-fbtst_DEPENDENCIES =  src/.libs/libfb.a
+fbtst_DEPENDENCIES =  src/.libs/libofbis.a
 fbtst_LDFLAGS = 
 SCRIPTS =  $(bin_SCRIPTS)
 

@@ -1,7 +1,7 @@
 Framebuffer Library Programming Reference
 =========================================
 
-N.B. Tabsize for this and all libfb files is 8, like linux.
+N.B. Tabsize for this and all ofbis files is 8, like linux.
 
 A minimal framebuffer program would have something like:
 

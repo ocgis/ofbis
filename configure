@@ -2468,6 +2468,9 @@ fi
 done
 
 
+OSISINCLUDE=${includedir}/osis
+
+
 
 
 trap '' 1 2 15
@@ -2632,6 +2635,7 @@ s%@LIBTOOL@%$LIBTOOL%g
 s%@AWK@%$AWK%g
 s%@CPP@%$CPP%g
 s%@OFBIS_VERSION@%$OFBIS_VERSION%g
+s%@OSISINCLUDE@%$OSISINCLUDE%g
 
 CEOF
 EOF

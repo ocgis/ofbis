@@ -15,7 +15,7 @@ FBerror( unsigned short flags, const char *fmt, ... )
 	va_list args;
 	va_start( args, fmt );
 
-	printf("libfb %s: ",(fatal?"fatal error":"warning") );
+	printf("ofbis %s: ",(fatal?"fatal error":"warning") );
 	vprintf( fmt, args );
 	va_end( args );
 	if (syserr)
@@ -27,7 +27,7 @@ FBerror( unsigned short flags, const char *fmt, ... )
 		FBshutdown();
 }
 
-/* Shutdown libfb in case of a fatal error */
+/* Shutdown ofbis in case of a fatal error */
 
 void
 FBshutdown( void )

@@ -1,5 +1,5 @@
 #include <sys/ioctl.h>
-#include "libfb.h"
+#include "ofbis.h"
 #include "fberror.h"
 #include "fbfuncs.h"
 

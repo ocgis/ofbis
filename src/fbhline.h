@@ -1,7 +1,7 @@
 #ifndef _FBHLINE_H_
 #define _FBHLINE_H_
 
-#include "libfb.h"
+#include "ofbis.h"
 
 /* Horizontal line functions */
 

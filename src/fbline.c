@@ -1,4 +1,4 @@
-#include "libfb.h"
+#include "ofbis.h"
 #include "fbline.h"
 
 #define	MIN(a,b)	( (a) < (b) ? (a) : (b) )

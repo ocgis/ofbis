@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "libfb.h"
+#include "ofbis.h"
 #include "fballoc.h"
 #include "fbevent.h"	/* for debugging */
 
@@ -13,7 +13,7 @@
 #define	WSWAP(s) ((s<<16)|(s>>16))
 #define UPPER(s) (((s)<<16) & 0xFFFF0000)
 
-/* This is quite general, could go in libfb.h instead */
+/* This is quite general, could go in ofbis.h instead */
 #define EVENWORD(s) (((s)+15) >> 4)
 
 

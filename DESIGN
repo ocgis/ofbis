@@ -1,60 +1,66 @@
-Firstly when updating the code, please use the linux standard - tab width 8,
-and tabs not spaces for indenting.
+Firstly when updating the code, please use the linux standard - tab
+width 8, and tabs not spaces for indenting.
 
-Let me explain something about my intended structure: the drawing functions are
-grouped according to type at present: so fbhline.[ch] contains all the code for
-drawing a horizontal line, on any supported hardware.
+Let me explain something about my intended structure: the drawing
+functions are grouped according to type at present: so fbhline.[ch]
+contains all the code for drawing a horizontal line, on any supported
+hardware.
 
-Now I realise some of you will immediately think, why not group it according
-to screen type, like the X server does? That would mean directories such as
-ipl and chunky with a separate fbhline.c in each one. Well I'm not against
-that, but I would like to keep the library unified, so that hardware may be
-supported in the one version of the library. However I'm quite open on this,
-and would welcome discussion of it on the nocrew-osis list.
+Now I realise some of you will immediately think, why not group it
+according to screen type, like the X server does? That would mean
+directories such as ipl and chunky with a separate fbhline.c in each
+one. Well I'm not against that, but I would like to keep the library
+unified, so that hardware may be supported in the one version of the
+library. However I'm quite open on this, and would welcome discussion
+of it on the nocrew-osis list.
 
-For each drawing function (such as hline for horizontal lines), there are 3
-'levels' of functions for the task.
+For each drawing function (such as hline for horizontal lines), there
+are 3 'levels' of functions for the task.
 
-1) Generic function, entirely in C, using lower level libfb functions.
-This is genhl() in fbhline.c. Notice it uses the putpixel function of the libfb.
+1) Generic function, entirely in C, using lower level ofbis functions.
+This is genhl() in fbhline.c. Notice it uses the putpixel function of
+the ofbis.
 
 2) Screen specific function, entirely in C, using direct access to the
-framebuffer. There will be many of these, one for each type of screen layout.
-The remainder of functions in fbhline.c are an example of these functions.
+framebuffer. There will be many of these, one for each type of screen
+layout.  The remainder of functions in fbhline.c are an example of
+these functions.
 
-3) Screen specific function, entirely in assembly, using direct access to the
-framebuffer. These are optimized assembly versions of level 2) functions.
-Currently there are no examples of this in libfb.
+3) Screen specific function, entirely in assembly, using direct access
+to the framebuffer. These are optimized assembly versions of level 2)
+functions. Currently there are no examples of this in ofbis.
 
-The rationale behind this scheme is that level 1) type functions enable rapid
-development of the library, and easier porting to new machines. level 2) and 3)
-functions can come later, and should be optimized for speed in C or asm
-respectively. The level 2) functions are designed to enable fast versions of
-routines to be able to be coded quickly and with some degree of portability.
-Level 3) functions are designed to be the fastest, and should be used if
-possible.
+The rationale behind this scheme is that level 1) type functions
+enable rapid development of the library, and easier porting to new
+machines. level 2) and 3) functions can come later, and should be
+optimized for speed in C or asm respectively. The level 2) functions
+are designed to enable fast versions of routines to be able to be
+coded quickly and with some degree of portability.  Level 3) functions
+are designed to be the fastest, and should be used if possible.
 
-The next important place to look at is the file fbfuncs.c. Here all the function
-pointers are assigned to the appropriate members in the FB struct. It should be
-self explanatory upon inspection.
+The next important place to look at is the file fbfuncs.c. Here all
+the function pointers are assigned to the appropriate members in the
+FB struct. It should be self explanatory upon inspection.
 
-Why do it the 'clumsy' way in fbfuncs.c and assign each member explicitly?
-The answer: speed.
+Why do it the 'clumsy' way in fbfuncs.c and assign each member
+explicitly?  The answer: speed.
 
 Speed is the most important objective of this library.
 ------------------------------------------------------
 
-I did not want the added burden of an extra pointer dereference every time a
-drawing function is called, so that is why I did not conveniently place the
-functions pointers in a static struct.
+I did not want the added burden of an extra pointer dereference every
+time a drawing function is called, so that is why I did not
+conveniently place the functions pointers in a static struct.
 
-Please take a look at the FB management/VT switching code in fbopen.c/fbvt.c
-there is probably quite a bit of rubbish that can be removed.
+Please take a look at the FB management/VT switching code in
+fbopen.c/fbvt.c there is probably quite a bit of rubbish that can be
+removed.
 
-I'd be interested to hear comments about the VT switching scheme, any ideas to
-make it faster and/or reduce the overhead per drawing call?
+I'd be interested to hear comments about the VT switching scheme, any
+ideas to make it faster and/or reduce the overhead per drawing call?
 
-Please send unified diffs to the development list nocrew-osis@nocrew.org.
+Please send unified diffs to the development list
+nocrew-osis@nocrew.org.
 
 Martin Mitchell <martin@debian.org>
 7/10/96

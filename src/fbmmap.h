@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 #include <sys/mman.h>
-#include "libfb.h"
+#include "ofbis.h"
 
 inline static void
 FBmap(FB *f)

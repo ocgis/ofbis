@@ -1,9 +1,9 @@
 #ifndef _FBEVENT_H_
 #define _FBEVENT_H_
 
-/* FBevent - event handling for libfb */
+/* FBevent - event handling for ofbis */
 
-#include "libfb.h"
+#include "ofbis.h"
 
 /*enum	eventtype
 {

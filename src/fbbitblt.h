@@ -1,7 +1,7 @@
 #ifndef _FBBITBLT_H_
 #define _FBBITBLT_H_
 
-#include "libfb.h"
+#include "ofbis.h"
 
 /* Bitblt functions */
 

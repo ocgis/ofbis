@@ -1,4 +1,4 @@
-/* FBevent - event handling for libfb */
+/* FBevent - event handling for ofbis */
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <string.h>
-#include "libfb.h"
+#include "ofbis.h"
 #include "fberror.h"
 #include "fbevent.h"
 #include "fbkbd.h"

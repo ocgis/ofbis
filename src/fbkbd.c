@@ -183,7 +183,7 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
 
   /* Search for special keys now */
 
-  /* Kill libfb */
+  /* Kill ofbis */
 
   if (ModifierDown (Mode_Ctrl) && ModifierDown (Mode_RShift)  &&
       (keycode == K_PSTAR))

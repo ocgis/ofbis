@@ -1,7 +1,7 @@
 #ifndef _FBCHAR_H_
 #define _FBCHAR_H_
 
-#include "libfb.h"
+#include "ofbis.h"
 
 /* Putchar functions */
 

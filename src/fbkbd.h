@@ -1,7 +1,7 @@
 #ifndef _FBKBD_H_
 #define _FBKBD_H_
 
-#include "libfb.h"
+#include "ofbis.h"
 #include "fbevent.h"
 
 void	FBkbdopen( FB *f );

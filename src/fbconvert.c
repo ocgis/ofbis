@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "libfb.h"
+#include "ofbis.h"
 #include "fballoc.h"
 #include "fbconvert.h"
 

@@ -76,8 +76,8 @@ if test "$echo_exec_prefix" = "yes"; then
 	echo $exec_prefix
 fi
 if test "$echo_cflags" = "yes"; then
-	echo -I@prefix@/include/fb $includes
+	echo -I@OSISINCLUDE@ $includes
 fi
 if test "$echo_libs" = "yes"; then
-	echo "-L@libdir@ -lfb"
+	echo "-L@libdir@ -lofbis"
 fi
