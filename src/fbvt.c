@@ -262,15 +262,11 @@ FBVTswitch(int s)
 
     /* Find current FB struct */
 
-    fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: Calling FBfindFB from pid %d\n", getpid ());
-
     f = FBfindFB();
   }
 
   /* If drawing, a change in the screen buffer will cause problems: */
   /* delay switch and hope next time it isn't drawing. */
-
-  fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 1\n");
 
   if (f->drawing)
   {
@@ -279,12 +275,9 @@ FBVTswitch(int s)
     return;
   }
 
-  fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 2\n");
-
   if (f->visible)
   {
     if (f->use_backing) {
-      fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 21\n");
       /* Switching out, allocate new backing store */
       f->sbak = (unsigned short *) FBalloc (f->finf.smem_len);
       
@@ -292,26 +285,20 @@ FBVTswitch(int s)
         FBerror( FATAL | SYSERR, "FBVTswitch: failed to allocate backing store");
       }
       
-      fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: sbak=0x%x sbuf=0x%x smem_len=0x%x23\n",
-               f->sbak, f->sbuf, f->finf.smem_len);
       /* Copy framebuffer to backing store */
       
       (void) memcpy( f->sbak, f->sbuf, f->finf.smem_len );
-      
-      fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 24\n");
     }
 
     /* Unmap current framebuffer */
 
     FBunmap(f);
 
-    fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 25\n");
     /* Make backing store current so it can be written to */
 
     f->sbuf=f->sbak;
     f->visible=FALSE;
 
-    fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 26\n");
     /* Release console for switch */
 
     if ( ioctl(f->tty, VT_RELDISP, 1) == -1 )
@@ -321,7 +308,6 @@ FBVTswitch(int s)
   }
   else
   {
-    fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 22\n");
     /* Acknowledge switch back to this VT */
     if ( ioctl(f->tty, VT_RELDISP, VT_ACKACQ) == -1 )
     {
@@ -345,7 +331,6 @@ FBVTswitch(int s)
 
     f->visible=TRUE;
   }
-  fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 3\n");
 
   switching=FALSE;
 }

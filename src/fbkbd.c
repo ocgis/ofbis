@@ -129,8 +129,8 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
   printf("State before is %x\n", state);
   printf("Key is 0x%04x\n", key);
-  */
   fprintf (stderr, "ofbis: fbkbd.c: FBprocesskey: pid %d\n", getpid ());
+  */
 
   keycode = translate_key (f->tty, scancode);
   /*
