@@ -3,7 +3,6 @@
 #ifndef _OFBIS_H_
 #define _OFBIS_H_
 
-#include <sys/time.h>
 #include <linux/fb.h>
 
 /* Options for FBsetwritemode */
@@ -248,7 +247,7 @@ typedef union fb_event
 } FBEVENT;
 
 void    FBgetevent( FB *f, FBEVENT *ev );
-void    FBcheckevent( FB *f, FBEVENT *ev, struct timeval *tv );
+void    FBcheckevent( FB *f, FBEVENT *ev, int timeout );
 int     FBgetchar( FB *f );
 
 #endif /* _OFBIS_H_ */
