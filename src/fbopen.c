@@ -33,11 +33,11 @@ FBopen( const char *fbname, unsigned short opts )
     
     fbname = getenv("FRAMEBUFFER");
     if ( !fbname ) {
-      fbname = "/dev/fb0current";	
+      fbname = "/dev/fb0";
     }
   }
 
-  if ( (f->fb = open( fbname, O_RDONLY/*WR*/ )) == -1 ) {
+  if ( (f->fb = open( fbname, O_RDONLY/*WR*/ | O_NONBLOCK )) == -1 ) {
     FBerror( FATAL | SYSERR, "FBopen: open failed on %s", fbname );
   }
   
