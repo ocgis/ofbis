@@ -8,6 +8,9 @@
 /* 0, 1, 2 or 3 */
 #define BBDEBUG 0
 
+#define BITBLT_BACKWARD 0
+#define BITBLT_FORWARD 1
+
 #define SWAP(s)	s=0x0000 | (s<<16)
 #define RSWAP(s) s=0x00000000 | (s>>16)
 #define	WSWAP(s) ((s<<16)|(s>>16))
@@ -78,8 +81,63 @@
 	case 0xF: d = (d & ~endmask) | (ALL_BLACK(s,d)	& endmask);	break;	\
 	}
 
+static __inline__
+void copyline(char *dst, const char *src, size_t num, int dir, int logicop)
+{
+  int i;
+  
+  if(dir) {
+    for(i=0; i<num; i++) {
+      LOGICOP(dst[i], src[i], 0x3);
+    }
+  } else {
+    for(i=num-1; i>=0; i--) {
+      LOGICOP(dst[i], src[i], 0x3);
+    }
+  }
+}
+
 void
 pp_bitblt( FB *f, FBBLTPBLK *fbb )
+{
+  unsigned char *sbase = ((__u8 *) fbb->s_form) + 
+			  (fbb->s_xmin * fbb->plane_ct) / 8 + 
+			  (fbb->s_ymin * fbb->s_nxln);
+  unsigned char *dbase = ((__u8 *) fbb->d_form) + 
+			  (fbb->d_xmin * fbb->plane_ct) / 8 + 
+			  (fbb->d_ymin * fbb->d_nxln);
+  unsigned char *tdbase, *tsbase;
+  int hcnt;
+
+  /* This is screwed, because it will only work
+   * if s_nxln == d_nxln when sbase and dbase
+   * are pointing to overlapping areas
+   */
+
+  /* checking ultimate example */
+  if(sbase == dbase) 
+    return;
+  if(sbase < dbase) {
+    tsbase = sbase + fbb->s_nxln * (fbb->b_ht-1);
+    tdbase = dbase + fbb->d_nxln * (fbb->b_ht-1);
+    for(hcnt = fbb->b_ht-1; hcnt >= 0; hcnt--) {
+      copyline(tdbase, tsbase, (fbb->b_wd * fbb->plane_ct) / 8,
+	       BITBLT_BACKWARD, fbb->op_tab);
+      tsbase -= fbb->s_nxln;
+      tdbase -= fbb->d_nxln;
+    }
+  } else {
+    for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
+      copyline(dbase, sbase, (fbb->b_wd * fbb->plane_ct) / 8,
+	       BITBLT_FORWARD, fbb->op_tab);
+      sbase += fbb->s_nxln;
+      dbase += fbb->d_nxln;
+    }
+  }
+}
+
+void
+old_pp_bitblt( FB *f, FBBLTPBLK *fbb )
 {
   unsigned char *sbase = ((__u8 *) fbb->s_form) + 
 			  (fbb->s_xmin * fbb->plane_ct) / 8 + 
