@@ -137,69 +137,112 @@ setplanes8( FB *f )
 void
 FBsetfuncs( FB *f )
 {
-	/* I believe only one type of bitblt is needed (Tomas) */
-        /* You believe wrong.. */
-        /* f->bitblt = &bitblt; */
+  switch(f->finf.type) { /* FB_TYPE_* */
+  case FB_TYPE_INTERLEAVED_PLANES:
+    switch(f->finf.visual) { /* FB_VISUAL_* */
+    case FB_VISUAL_PSEUDOCOLOR:
+      switch(f->vinf.bits_per_pixel) {
+      case 1:		/* Atari interleaved 1 plane */
+	setinterleave1(f);
+	break;
 
-	if ( f->finf.type == FB_TYPE_INTERLEAVED_PLANES )
-	{
-		switch (f->vinf.bits_per_pixel)
-		{
-			case 1: setinterleave1(f); break;
-			case 2:	setinterleave2(f); break;
-			case 4: setinterleave4(f); break;
-			case 8: setinterleave8(f); break;
-			default: FBerror( FATAL, "FBsetfuncs: unsupported "
-						"interleaved planes mode.");
-		}
-	}
-	else if ( f->finf.type == FB_TYPE_PACKED_PIXELS )
-	{
-	  switch (f->finf.visual) {
-	  case FB_VISUAL_MONO01:
-	    setinterleave1(f);
-	    break;	/* need to fix colours here? */
+      case 2:		/* Atari interleaved 2 planes */
+	setinterleave2(f);
+	break;
+
+      case 4:		/* Atari interleaved 4 planes */
+	setinterleave4(f);
+	break;
+
+      case 8:		/* Atari interleaved 8 planes */
+	setinterleave8(f);
+	break;
+
+      default:
+	FBerror(FATAL, "FBsetfuncs: unsupported depth in interleaved planes mode (%d).",
+		f->vinf.bits_per_pixel);
+      }
+      break;
+
+    default:
+      FBerror(FATAL, "FBsetfuncs: unsupported interleaved planes mode (%d).",
+	      f->finf.visual);
+    }
+    break;
+
+  case FB_TYPE_PLANES:
+    switch(f->finf.visual) { /* FB_VISUAL_* */
+    case FB_VISUAL_PSEUDOCOLOR:
+      switch(f->vinf.bits_per_pixel) {
+      case 1:		/* Amiga 1 plane */
+	setplanes1(f);
+	break;
+
+      case 2:		/* Amiga 2 planes */
+	setplanes2(f);
+	break;
+
+      case 4:		/* Amiga 4 planes */
+	setplanes4(f);
+	break;
+
+      case 8:		/* Amiga 8 planes */
+	setplanes8(f);
+	break;
+
+      default:
+	FBerror(FATAL, "FBsetfuncs: unsupported depth in planes mode (%d).",
+		f->vinf.bits_per_pixel);
+      }
+      break;
+
+    default:
+      FBerror(FATAL, "FBsetfuncs: unsupported planes mode (%d).",
+	      f->finf.visual);
+    }
+    break;
+
+  case FB_TYPE_PACKED_PIXELS:
+    switch (f->finf.visual) { /* FB_VISUAL_* */
+    case FB_VISUAL_MONO01:
+      setinterleave1(f);
+      break;	/* need to fix colours here? */
 	  
-	  case FB_VISUAL_MONO10:
-	    setinterleave1(f);
-	    break;
+    case FB_VISUAL_MONO10:
+      setinterleave1(f);
+      break;
 
-	  case FB_VISUAL_TRUECOLOR:
-	    settruecolour(f);
-	    break;
+    case FB_VISUAL_TRUECOLOR:
+      settruecolour(f);
+      break;
 	  
-	  case FB_VISUAL_PSEUDOCOLOR:
-	  case FB_VISUAL_STATIC_PSEUDOCOLOR:
-	    /*
-	    ** TBD
-	    ** Check bits per pixel and call the right setup function
-	    */
-	    setpackedpixel8 (f);
-	    break;
+    case FB_VISUAL_PSEUDOCOLOR:
+    case FB_VISUAL_STATIC_PSEUDOCOLOR:
+      switch(f->vinf.bits_per_pixel) {
+      case 1:		/* Atari mono/duocolour */
+	setinterleave1(f);
+	break;
 
-	  default:
-	    FBerror( FATAL, "FBsetfuncs: unsupported "
-		     "visual type in packed pixels (0x%x).",
-		     f->finf.visual);
-	  }
-	}
-	else if ( f->finf.type == FB_TYPE_PLANES )
-	{
-		switch (f->finf.visual)
-		{
-			case FB_VISUAL_PSEUDOCOLOR:
-			{
-				switch ( f->vinf.bits_per_pixel )
-				{
-					case 1: setplanes1(f); break;		/* Amiga OCS */
-					case 2: setplanes2(f); break;		/* Amiga OCS */
-					case 4: setplanes4(f); break;		/* Amiga OCS */
-					case 8: setplanes8(f); break;		/* Amiga OCS */
-					default: FBerror( FATAL, "FBsetfuncs: unsupported depth in planes mode.");
-				}
-			} break;
-			default: FBerror( FATAL, "FBsetfuncs: unsupported "
-						"visual type in planes mode.");
-		}
-	}
+      case 8:		/* 8-bit chunk mode */
+	setpackedpixel8(f);
+	break;
+
+      case 2:				/* exists? */
+      case 4:				/* exists? */
+      default:
+	FBerror(FATAL, "FBsetfuncs: unsupported depth in pseudocolor mode (%d).",
+		f->vinf.bits_per_pixel);
+      }
+      break;
+
+    default:
+      FBerror(FATAL, "FBsetfuncs: unsupported visual type in packed pixels (%d).",
+	      f->finf.visual);
+    }
+    break;
+
+  default:
+    FBerror(FATAL, "FBsetfuncs: unsupported type (%d).",
+	    f->finf.type);
+  }
 }
