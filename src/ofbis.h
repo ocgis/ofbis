@@ -3,7 +3,12 @@
 #ifndef _OFBIS_H_
 #define _OFBIS_H_
 
+#include <sys/types.h>
 #include <linux/fb.h>
+
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ == 0
+#include <asm/types.h>
+#endif
 
 /* Options for FBsetwritemode */
 typedef enum {

@@ -9,9 +9,12 @@ FBmap(FB *f)
 {
   off_t offset = 0;
 
+/* Older kernel headers doesn't define this */
+#ifdef FB_ACCEL_SUN_CGSIX
   /* Some cards need a special mmap with offset */
   if(f->finf.accel == FB_ACCEL_SUN_CGSIX)
     offset = 0x70000000 + 0x16000;  
+#endif
 
 	/* Map fb into memory */
 
