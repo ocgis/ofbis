@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <signal.h>
 #include "src/libfb.h"
-#include "src/fbevent.h"
 
 #define CHARTEST
 #undef BLITTEST
@@ -222,8 +221,6 @@ main( int argc, char **argv )
 	FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, 11,0, 's');
 
 	{
-/* extern declarations of fonts */
-#include "src/fonts/fonts.h"
 
 	FBFONT fnt;
 
@@ -244,7 +241,6 @@ main( int argc, char **argv )
 	fnt.height = fontheight_8x16;
 	FBsetfont(f, &fnt);
 	puttext(200,50);
-
 
 	}
 #endif /* CHARTEST */
