@@ -1,154 +1,226 @@
-#include <stdio.h>	/* for printf */
+#include <errno.h>
+#include <stdio.h>      /* for printf */
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/vt.h>
 #include <linux/kd.h>
+#include <linux/keyboard.h>
 #include "fberror.h"
 #include "fbkbd.h"
 #include "fbkeys.h"
 #include "fbkeytbl.h"
 
-static	int		oldkbdmode;
-static	struct termios	oldttysets;
+static  int             oldkbdmode;
+static  struct termios  oldttysets;
+
+static int keymap_index[MAX_NR_KEYMAPS];
+static int number_of_keymaps;
+
+static
+void
+get_keymaps (int fd) {
+  int i, j;
+  struct kbentry ke;
+
+  for (i = 0; i < MAX_NR_KEYMAPS; i++) {
+    ke.kb_index = 0;
+    ke.kb_table = i;
+    j = ioctl(fd, KDGKBENT, (unsigned long)&ke);
+    if (j && errno != EINVAL) {
+      fprintf(stderr, "KDGKBENT at index 0 in table %d: ", i);
+      perror("");
+      exit(1);
+    }
+    
+    if (!j && (ke.kb_value != K_NOSUCHMAP)) {
+      keymap_index[number_of_keymaps++] = i;
+    }
+  }
+
+  fprintf (stderr,
+           "ofbis: fbkbd.c: get_keymaps: number_of_keymaps=%d\n",
+           number_of_keymaps);
+}
+
 
 void
 FBkbdopen( FB *f )
 {
-	struct termios	nttysets;
+  struct termios  nttysets;
 
-	/* Initialise: save old kbd state and tty settings */
+  /* Build keyboard translation tables */
+  get_keymaps (f->tty);
 
-	ioctl( f->tty, KDGKBMODE, &oldkbdmode );
-	tcgetattr ( f->tty, &oldttysets );
+  /* Initialise: save old kbd state and tty settings */
 
-	/* Install new kbd mode and tty settings */
+  ioctl( f->tty, KDGKBMODE, &oldkbdmode );
+  tcgetattr ( f->tty, &oldttysets );
 
-	ioctl( f->tty, KDSKBMODE, K_MEDIUMRAW );	/* Change to full K_RAW someday */
-	nttysets = oldttysets;
-	nttysets.c_iflag = ( IGNPAR | IGNBRK ) & ( ~PARMRK ) & ( ~ISTRIP );
-	nttysets.c_oflag = 0;
-	nttysets.c_cflag = CREAD | CS8;
-	nttysets.c_lflag = 0;
-	nttysets.c_cc[VTIME] = 0;
-	nttysets.c_cc[VMIN] = 1;
-	cfsetispeed( &nttysets, B9600 );
-	cfsetospeed( &nttysets, B9600 );
-	tcsetattr( f->tty, TCSANOW, &nttysets );
+  /* Install new kbd mode and tty settings */
+
+  ioctl( f->tty, KDSKBMODE, K_MEDIUMRAW );        /* Change to full K_RAW someday */
+  nttysets = oldttysets;
+  nttysets.c_iflag = ( IGNPAR | IGNBRK ) & ( ~PARMRK ) & ( ~ISTRIP );
+  nttysets.c_oflag = 0;
+  nttysets.c_cflag = CREAD | CS8;
+  nttysets.c_lflag = 0;
+  nttysets.c_cc[VTIME] = 0;
+  nttysets.c_cc[VMIN] = 1;
+  cfsetispeed( &nttysets, B9600 );
+  cfsetospeed( &nttysets, B9600 );
+  tcsetattr( f->tty, TCSANOW, &nttysets );
 }
 
 char
 FBkbdgetkey( FB *f )
 {
-	char	buf;
+  char    buf;
 
-	if ( read( f->tty, &buf, sizeof(char) ) == -1 )
-	{
-		return -1;
-	}
-	else
-	{
-		return buf;
-	}
+  if ( read( f->tty, &buf, sizeof(char) ) == -1 )
+  {
+    return -1;
+  }
+  else
+  {
+    return buf;
+  }
 }
 
-#define	SETORCLEAR(x)		\
-	if (pressed)		\
-	{			\
-		state |= (x);	\
-	}			\
-	else			\
-	{			\
-		state &= ~(x);	\
-	}
+#define SETORCLEAR(x)           \
+        if (pressed)            \
+        {                       \
+                state |= (x);   \
+        }                       \
+        else                    \
+        {                       \
+                state &= ~(x);  \
+        }
+
+
+int
+translate_key (int  fd,
+               char index) {
+  char           table = 0;
+  struct kbentry ke;
+
+  ke.kb_index = index;
+  ke.kb_table = table;
+  if (ioctl(fd, KDGKBENT, (unsigned long)&ke)) {
+    fprintf(stderr, "KDGKBENT at index %d in table %d: ",
+            index, table);
+    perror("");
+    exit(1);
+  }
+  return ke.kb_value;
+}
+
 
 void
 FBprocesskey( FB *f, FBKEYEVENT *ev )
 {
-	unsigned int	key = FBkbdgetkey( f );
-	int		scancode = ( 0x7f & key );
-	int		pressed = ( ( 0x80 & key ) ? FALSE : TRUE );
-	static int	state = 0;
+  unsigned int    key = FBkbdgetkey( f );
+  int             keycode;
+  int             scancode = ( 0x7f & key );
+  int             pressed = ( ( 0x80 & key ) ? FALSE : TRUE );
+  static int      state = 0;
 
-	printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
-	printf("State before is %x\n", state);
-	printf("Key is 0x%04x\n", key);
-	switch (scancode)
-	{
-	case KEY_ShiftR:	SETORCLEAR(Mode_RShift)	break;
-	case KEY_ShiftL:	SETORCLEAR(Mode_LShift)	break;
-	case KEY_LCtrl:		SETORCLEAR(Mode_Ctrl)	break;
-	case KEY_Alt:		SETORCLEAR(Mode_Alt)	break;
-	case KEY_CapsLock:	if (!pressed)		break;
-				if (!ModifierDown(Mode_Caps) )
-				{
-					state |= Mode_Caps;
-				}
-				else
-				{
-					state &= ~Mode_Caps;
-				}
-				break;
-	case KEY_Insert:	SETORCLEAR(Mode_Insert)	break;
-	case KEY_ClrHome:	SETORCLEAR(Mode_Home)	break;
-	default:
-	}
-	ev->keycode = key;
-	ev->state = state;
-	if ( ModifierDown(Mode_Caps) )
-	{
-		ev->ascii = capslock[scancode];
-	}
-	else if ( (!ModifierDown(Mode_RShift)) && (!ModifierDown(Mode_LShift)) )
-	{
-		ev->ascii = unshifted[scancode];
-	}
-	else if ( (ModifierDown(Mode_RShift)) || (ModifierDown(Mode_LShift)) )
-	{
-		ev->ascii = shifted[scancode];
-	}
-	else
-	{
-		FBerror( FATAL, "Unknown keyboard state!");
-	}
+  /*
+  printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
+  printf("State before is %x\n", state);
+  printf("Key is 0x%04x\n", key);
+  */
 
-	/* Search for special keys now */
+  keycode = translate_key (f->tty, scancode);
+  /*
+  fprintf (stderr, "ofbis: FBprocesskey: keycode=0x%x 0x%x\n", keycode, K_ALT);
+  */
+  switch (keycode)
+  {
+  case K_SHIFTR :
+    SETORCLEAR(Mode_RShift);
+    break;
+  case K_SHIFTL :
+    SETORCLEAR(Mode_LShift);
+    break;
+  case K_CTRL:
+  case K_CTRLL:
+  case K_CTRLR:
+    SETORCLEAR(Mode_Ctrl);
+    break;
+  case K_ALT:
+    SETORCLEAR(Mode_Alt);
+    break;
+  case K_CAPSSHIFT:
+    if (!pressed) {
+      break;
+    }
 
-	/* Kill libfb */
+    if (!ModifierDown(Mode_Caps) )
+    {
+      state |= Mode_Caps;
+    }
+    else
+    {
+      state &= ~Mode_Caps;
+    }
+    break;
+  case K_INSERT:
+    SETORCLEAR(Mode_Insert);
+    break;
+    /*
+      What is the linux version of "home" called?
+      case KEY_ClrHome:
+      SETORCLEAR(Mode_Home);
+      */
+    break;
+  default:
+  }
+  ev->keycode = key;
+  ev->state = state;
+  ev->ascii = KVAL (keycode);
 
-	if ( ModifierDown(Mode_Ctrl) && ModifierDown(Mode_RShift)  &&
-		( scancode == KEY_KP_Asterisk ) )
-	{
-		FBerror( FATAL, "FB kill key pressed." );
-	}
+  /* Search for special keys now */
 
-	/* Console switching */
+  /* Kill libfb */
 
-	if ( (ModifierDown(Mode_Alt) && ModifierDown(Mode_Ctrl)) &&
-		( ( scancode>=KEY_F1 ) && ( scancode <= KEY_F10 ) ) )
-	{
-		int	vt = scancode - KEY_F1 + 1;
+  if (ModifierDown (Mode_Ctrl) && ModifierDown (Mode_RShift)  &&
+      (keycode == K_PSTAR))
+  {
+    FBerror( FATAL, "FB kill key pressed." );
+  }
 
-		if ( ModifierDown(Mode_RShift) || ModifierDown(Mode_LShift) )
-		{
-			vt += 10;
-		}
-		ev->state = 0xFFFFFFFF;
-		if ( ioctl( f->tty, VT_ACTIVATE, vt ) == -1 )
-		{
-			FBerror( WARNING | SYSERR, "FBprocesskey: VT switch failed" );
-		}
-	}
-	/*printf("State after is %x\n", state); 
-	printf("Got ascii %c %x\n", ev->ascii, (int) ev->ascii);*/
+  /* Console switching */
+
+  /*
+  fprintf (stderr, "ofbis: fbkbd.c: FBProcesskey: state=0x%x\n", ev->state);
+  */
+
+  if ((ModifierDown (Mode_Alt) && ModifierDown (Mode_Ctrl)) &&
+       ((keycode>=K_F1 ) && (keycode <= K_F10)))
+  {
+    int     vt = keycode - K_F1 + 1;
+
+    if ( ModifierDown(Mode_RShift) || ModifierDown(Mode_LShift) )
+    {
+      vt += 10;
+    }
+    ev->state = 0xFFFFFFFF;
+    if ( ioctl( f->tty, VT_ACTIVATE, vt ) == -1 )
+    {
+      FBerror( WARNING | SYSERR, "FBprocesskey: VT switch failed" );
+    }
+  }
+  /*printf("State after is %x\n", state); 
+    printf("Got ascii %c %x\n", ev->ascii, (int) ev->ascii);*/
 }
 
 void
 FBkbdclose( FB *f )
 {
-	/* Restore old kbd state and tty settings */
+  /* Restore old kbd state and tty settings */
 
-	ioctl( f->tty, KDSKBMODE, oldkbdmode );
-	tcsetattr( f->tty, TCSANOW, &oldttysets );
+  ioctl( f->tty, KDSKBMODE, oldkbdmode );
+  tcsetattr( f->tty, TCSANOW, &oldttysets );
 }
 

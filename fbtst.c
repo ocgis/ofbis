@@ -7,7 +7,7 @@
 #define BLITTEST
 #define CHARTEST
 #define CMAPTEST
-#undef EVENTTEST
+#define EVENTTEST
 
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
@@ -269,7 +269,7 @@ main( int argc, char **argv )
     char ch;
     fprintf(stderr, "fbtst: before FBgetchar\n");
 
-    while (((ch=FBgetchar(f)) != 'a') && (i < 5)) {
+    while (((ch=FBgetchar(f)) != 'a') && (i < 10)) {
       fprintf(stderr, "fbtst: char=0x%x %c\n", ch, ch);
       i++;
     }

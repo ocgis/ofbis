@@ -18,9 +18,7 @@
 ** Description
 ** Get one keyboard or mouse event
 **
-** Revision history
 ** 1998-08-06 CG
-**            Added check for uninitialized mouse device handle.
 */
 void
 FBgetevent (FB *f, FBEVENT *ev) {
