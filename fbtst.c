@@ -163,7 +163,7 @@ main( int argc, char **argv )
     if (argc > 1) {
       j = atoi(argv[1]);
     }
-    
+
     if(j < 0) {
       sx=atoi(argv[2]);
       sy=atoi(argv[3]);
@@ -171,7 +171,8 @@ main( int argc, char **argv )
       dy=atoi(argv[5]);
       wd=atoi(argv[6]);
       ht=atoi(argv[7]);
-    } else {
+    } else if(j > 0) {
+      j--;
       j %= 40;
       sx=bbtest[j][0];
       sy=bbtest[j][1];
@@ -179,9 +180,7 @@ main( int argc, char **argv )
       dy=bbtest[j][3];
       wd=bbtest[j][4];
       ht=bbtest[j][5];
-    }
-    
-    {
+      {
       /*
       FBBLTPBLK fbb={ wd, ht, 0, 0, 0, 0x03030303,
 		      sx, sy, NULL, 0, 0, 0,
@@ -215,6 +214,7 @@ main( int argc, char **argv )
       FBputpixel(f,dx+(wd-1),dy+(ht-1),10L);
       FBputpixel(f,dx,dy+(ht-1),10L);
       
+      }
     }
   }
 #endif /* BLITTEST */
@@ -232,6 +232,19 @@ main( int argc, char **argv )
   FBputchar(f, fnt.width/2+fnt.width*2+x,fnt.height+y, 9,0, 'l'); \
   FBputchar(f, fnt.width/2+fnt.width*3+x,fnt.height+y, 10,0, 'e'); \
   FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, 11,0, 's');
+
+#define puttext_tc(x,y)  \
+  FBputchar(f, fnt.width*0+x,y, 0x55555500,0, 'N'); \
+  FBputchar(f, fnt.width*1+x,y, 0x66666600,0, 'o'); \
+  FBputchar(f, fnt.width*2+x,y, 0x77777700,0, 'C'); \
+  FBputchar(f, fnt.width*3+x,y, 0x88888800,0, 'r'); \
+  FBputchar(f, fnt.width*4+x,y, 0x99999900,0, 'e'); \
+  FBputchar(f, fnt.width*5+x,y, 0xaaaaaa00,0, 'w'); \
+  FBputchar(f, fnt.width/2+fnt.width*0+x,fnt.height+y, 0xbbbbbb00,0, 'R'); \
+  FBputchar(f, fnt.width/2+fnt.width*1+x,fnt.height+y, 0xcccccc00,0, 'u'); \
+  FBputchar(f, fnt.width/2+fnt.width*2+x,fnt.height+y, 0xdddddd00,0, 'l'); \
+  FBputchar(f, fnt.width/2+fnt.width*3+x,fnt.height+y, 0xeeeeee00,0, 'e'); \
+  FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, 0xffffff00,0, 's');
   {  
     FBFONT fnt;
     
@@ -239,20 +252,31 @@ main( int argc, char **argv )
     fnt.width = fontwidth_6x11;
     fnt.height = fontheight_6x11;
     FBsetfont(f, &fnt);
-    puttext(0,0);
+    if(f->vinf.bits_per_pixel > 8) {
+      puttext_tc(0,0);
+    } else {
+      puttext(0,0);
+    }
     
     fnt.data = fontdata_8x8;
     fnt.width = fontwidth_8x8;
     fnt.height = fontheight_8x8;
     FBsetfont(f, &fnt);
-    puttext(100,100);
+    if(f->vinf.bits_per_pixel > 8) {
+      puttext_tc(100,100);
+    } else {
+      puttext(100,100);
+    }
     
     fnt.data = fontdata_8x16;
     fnt.width = fontwidth_8x16;
     fnt.height = fontheight_8x16;
     FBsetfont(f, &fnt);
-    puttext(200,50);
-    
+    if(f->vinf.bits_per_pixel > 8) {
+      puttext_tc(200,50);
+    } else {
+      puttext(200,50);
+    }
   }
 #endif /* CHARTEST */
 
