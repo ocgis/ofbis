@@ -77,45 +77,74 @@ FBfreecmap( FBCMAP *fbcmap )
 	FBfree( fbcmap );
 }
 
-unsigned long
-FBc24_to_cnative( FB *f, unsigned long col24 )
+u_int32_t
+FBc24_to_cnative( FB *f, u_int32_t col24 )
 {
+  int nr_of_colours, best_diff, best_match, i, diff;
+  int red, green, blue;
+  FBCMAP *fbcmap;
+  unsigned char *cp= (char *)&col24;
+  u_int16_t pval;
 
-	if(f->finf.visual != FB_VISUAL_TRUECOLOR)
-		return col24;
+  /* For palette based modes, we try to find the best matching
+   * colour index.
+   */
+  if(f->finf.visual == FB_VISUAL_PSEUDOCOLOR) {
+    nr_of_colours = 1 << f->vinf.bits_per_pixel;
+    fbcmap = FBgetcmap(f);
+    if(fbcmap == NULL)
+      return 0;
 
-	switch(f->vinf.bits_per_pixel) {
-	case 16:
-	{
-		unsigned char *cp= (char *)&col24;
-		unsigned short pval = ((*++cp << 8 ) & 0xF800) |
-				      ((*++cp << 3 ) & 0x07E0) |
-				      ((*++cp >> 3 ) & 0x001F);
-		return pval;
-	}		
-		break;
-	default:
-		return col24;
-	}
+    best_diff = 1024;
+    best_match = nr_of_colours - 1;
+    for(i = 0 ; i < nr_of_colours ; i++) {
+      red   = ((col24 >> 16) & 0xff) - (fbcmap->red[i] >> 8);
+      green = ((col24 >>  8) & 0xff) - (fbcmap->green[i] >> 8);
+      blue  = ((col24      ) & 0xff) - (fbcmap->blue[i] >> 8);
+      diff = red * red + green * green + blue * blue;
+      if(diff < best_diff) {
+	best_diff = diff;
+	best_match = i;
+      }
+    }
+
+    FBfreecmap(fbcmap);
+
+    return best_match;
+  }
+
+  /* Truecolor */  
+  pval = (((cp[1] & ((1 << f->vinf.red.length) - 1)) << f->vinf.red.offset) |
+	  ((cp[2] & ((1 << f->vinf.green.length) - 1)) << f->vinf.green.offset) |
+	  ((cp[3] & ((1 << f->vinf.blue.length) - 1)) << f->vinf.blue.offset));
+  return (u_int32_t)pval;
 }
 
-unsigned long
-FBcnative_to_c24( FB *f, unsigned long col )
+u_int32_t
+FBcnative_to_c24( FB *f, u_int32_t col )
 {
+  FBCMAP *fbcmap;
+  int index, nr_of_colours;
+  u_int32_t colour;
 
-	if(f->finf.visual != FB_VISUAL_TRUECOLOR)
-		return col;
+  /* This picks out the colour from the palette. */
+  if(f->finf.visual == FB_VISUAL_PSEUDOCOLOR) {
+    fbcmap = FBgetcmap(f);
+    if(fbcmap == NULL)
+      return 0;
+    nr_of_colours = 1 << f->vinf.bits_per_pixel;
+    index = col < nr_of_colours ? col : nr_of_colours-1;
+    index = index >= 0 ? index : 0;
+    colour = ((((fbcmap->red[index] >> 8) & 0xff) << 16) |
+	      (((fbcmap->green[index] >> 8) & 0xff) <<  8) |
+	      (((fbcmap->blue[index] >> 8) & 0xff) <<  0));
+    FBfreecmap(fbcmap);
+    return colour;
+  }
 
-	switch(f->vinf.bits_per_pixel) {
-	case 16:
-	{
-		unsigned long pval = ((col & 0xF800) << 8) |
-				     ((col & 0x07E0) << 5) |
-				     ((col & 0x001F) << 3);
-		return pval;
-	}		
-		break;
-	default:
-		return col;
-	}
+  /* Truecolour */  
+  colour = (((col >> f->vinf.red.offset) & ((1 << f->vinf.red.length) - 1)) |
+	    ((col >> f->vinf.green.offset) & ((1 << f->vinf.green.length) - 1)) |
+	    ((col >> f->vinf.blue.offset) & ((1 << f->vinf.blue.length) - 1)));
+  return colour;
 }
