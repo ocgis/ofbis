@@ -113,9 +113,10 @@ FBVTopen(FB *f)
     chown("/dev/console",getuid(),getgid());
     chown("/dev/tty0",getuid(),getgid());*/
 
-  /* This seems unnecessary for us to do, but I'm still not sure. */
+  /* This seems necessary for us to do, but I'm still not sure why. */
 #if 0
   if (f->keeptty)
+#endif
     {
       int i;
       if ((i=open("/dev/tty",O_RDWR))>=0)
@@ -126,7 +127,6 @@ FBVTopen(FB *f)
       /*setsid();*/
       /*ioctl(f->tty,TIOCSCTTY);*/
     }
-#endif
 
   /* Get current VT number so we can switch back to it later */
 
