@@ -23,6 +23,7 @@ FBopen( const char *fbname, unsigned short opts )
   
   f->vtchoice = opts & 0x01;
   f->handle_kbd = (opts & FB_NO_KBD) == 0;
+  f->use_backing = (opts & FB_NO_BACKING_STORE) == 0;
   f->keeptty = FALSE;
   
   /* Open framebuffer fbname */
@@ -90,6 +91,7 @@ FBopen( const char *fbname, unsigned short opts )
 
 int
 FBclose( FB *f ) {
+
   /* Unmap framebuffer from memory */
   
   FBunmap(f);

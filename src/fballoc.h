@@ -1,7 +1,9 @@
 #ifndef _FBALLOC_H_
 #define _FBALLOC_H_
 
+/*
 #define	FBMEMDEBUG
+*/
 
 #ifdef FBMEMDEBUG
 void	*FBalloc( unsigned long size, const char *file, int line );

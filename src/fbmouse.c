@@ -57,8 +57,8 @@ FBprocessmouse( FBMOUSEEVENT *ev )
 	int	mousecode = FBmouseget();
 
 	ev->buttons = ( mousecode >> 16 ) & 0x07;
-	ev->x = (int)( (char) (( mousecode >> 8 ) & 0xFF ));
-	ev->y = (int)( - (char) ( mousecode & 0xFF ));
+	ev->x = (int)( (signed char) (( mousecode >> 8 ) & 0xFF ));
+	ev->y = (int)( - (signed char) ( mousecode & 0xFF ));
 	ev->state = 0;
 }
 
