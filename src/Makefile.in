@@ -66,6 +66,7 @@ CC = @CC@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LT_VERSION_INFO = @LT_VERSION_INFO@
 MAKEINFO = @MAKEINFO@
 NM = @NM@
 OFBIS_VERSION = @OFBIS_VERSION@
@@ -90,7 +91,7 @@ libofbis_la_SOURCES = \
 
 # This is a bad versioning system, since much has changed
 # in the interface during its early development.
-libofbis_la_LDFLAGS = -version-info 0:7:0
+libofbis_la_LDFLAGS = @LT_VERSION_INFO@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 

@@ -15,4 +15,4 @@ libofbis_la_SOURCES = \
 
 # This is a bad versioning system, since much has changed
 # in the interface during its early development.
-libofbis_la_LDFLAGS = -version-info 0:7:0
+libofbis_la_LDFLAGS = @LT_VERSION_INFO@
