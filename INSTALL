@@ -2,13 +2,13 @@
 * library still works, at least for me, with 2.0.x kernels, but needs 2.1.x 
 * include files to compile. - Tomas Berndtsson
 
-Just type "make" from the main directory, and that's it. "make install" is
-not well made, but works.
-If you are developing this, type "make dep" before you type make for complete
-dependencies.
+Just type "./configure" from the main directory, and "make" to compile 
+the library. That's it. "make install" will install the libraries and
+include files. Default install directory is /usr/local/lib/ and
+/usr/local/include/fb/.
 
-Internal library memory leak checking can be enabled/disabled by the #define in
-fballoc.h. At the moment it is set on.
+Internal library memory leak checking can be enabled/disabled by the #define 
+in fballoc.h. At the moment it is set on.
 
 Please see doc/ofbis.doc for a programming reference.
 
