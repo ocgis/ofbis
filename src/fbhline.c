@@ -107,9 +107,17 @@ hltc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned lo
 	register unsigned short	j = MAX(x1,x2);
 	register unsigned short	*pixel=f->sbuf+((y*f->vinf.xres_virtual)+x);
 
-	while ( x++ <= j )
-	{
-		*pixel++ = (unsigned short)col;
+	switch (f->writemode) {
+	case FB_XOR:
+	  while (x++ <= j) {
+	    *pixel++ = ~(unsigned short)*pixel;
+	  }
+	  break;
+
+	default:
+	  while (x++ <= j) {
+	    *pixel++ = (unsigned short)col;
+	  }
 	}
 }
 

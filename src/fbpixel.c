@@ -67,8 +67,15 @@ void
 pptc( FB *f, unsigned short x, unsigned short y, unsigned long col )
 {
   register unsigned short	*pixel=f->sbuf+((y*f->vinf.xres_virtual)+x);
-
-	*pixel = (unsigned short)col;
+  
+  switch(f->writemode) {
+  case FB_XOR:
+    *pixel = ~(unsigned short)*pixel;
+    break;
+    
+  default:
+    *pixel = (unsigned short)col;
+  }
 }
 
 /*
