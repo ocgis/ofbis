@@ -59,7 +59,7 @@ main( int argc, char **argv )
 	setup_signals();
 
 
-#ifdef BLTTEST
+#ifdef BLITTEST
 
 	printf("fbtst\n");
 	/*for (i=0,c=0L;i<320;c++,i++)
@@ -205,7 +205,7 @@ main( int argc, char **argv )
 
 	}
 	}
-#endif /* BLTTEST */
+#endif /* BLITTEST */
 
 #ifdef CHARTEST
 #define puttext(x,y)  \
