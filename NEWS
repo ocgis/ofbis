@@ -2,7 +2,7 @@ Latest version is 0.0.9
 
 1999-07-20      Tomas Berndtsson
                 Compile fix for glibc2.0.
-                Sparcstation card cgsix (tested) and cgthree
+                Sparcstation cards cgsix (tested) and cgthree
                 (untested) have been added.
                 FBgetevent/FBcheckevent now uses poll().
 
