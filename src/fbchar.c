@@ -164,7 +164,7 @@ pctc(FB *f,
       if (data & 0x80) {
 	*base = (unsigned short)fgcol;
       } else if (!(bgcol & 0x80000000)) {
-	*base = (unsigned short)0xffff; /* Hack to make white if bgcol == 0 which is really an error */
+	*base = (unsigned short)bgcol;
       }
 
       base++;
