@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
 #include "src/ofbis.h"
 
 #define BLITTEST
@@ -28,11 +29,11 @@ static void setup_signals()
   struct sigaction sigs;
           
   sigemptyset(&mask);
-            
+  
+  memset(&sigs,0,sizeof(sigs));
   sigs.sa_handler = signal_handler;
   sigs.sa_mask = mask;
   sigs.sa_flags = SA_ONESHOT;
-  sigs.sa_restorer = NULL;
              
   sigaction(SIGHUP, &sigs, NULL);
   sigaction(SIGINT, &sigs, NULL);
