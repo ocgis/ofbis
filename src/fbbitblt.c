@@ -80,10 +80,13 @@
 void
 pp_bitblt( FB *f, FBBLTPBLK *fbb )
 {
-  char *sbase, *dbase;
+  unsigned char *sbase = ((__u8 *) fbb->s_form) + 
+			  (fbb->s_xmin * fbb->plane_ct) / 8 + 
+			  (fbb->s_ymin * fbb->s_nxln);
+  unsigned char *dbase = ((__u8 *) fbb->d_form) + 
+			  (fbb->d_xmin * fbb->plane_ct) / 8 + 
+			  (fbb->d_ymin * fbb->d_nxln);
   int hcnt;
-  sbase = (char *) (((char *) fbb->s_form) + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
-  dbase = (char *) (((char *) fbb->d_form) + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
 
   for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
     memcpy((void *) dbase, (void *) sbase, (fbb->b_wd * fbb->plane_ct) / 8);
