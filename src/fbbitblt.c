@@ -83,7 +83,7 @@
 	}
 
 static __inline__
-void copyline(char *dst, const char *src, size_t num, int dir, int logicop)
+void copyline(char *dst, char *src, size_t num, int dir, int logicop)
 {
   register int i;
   
