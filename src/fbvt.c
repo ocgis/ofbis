@@ -19,7 +19,7 @@ typedef FB      *FBListValType;
 
 #include "fblist.h"
 
-static  char            *ttynames[]={"/dev/tty0", "/dev/console", NULL};
+static  char            *ttynames[]={"/dev/console", "/dev/tty", "/dev/tty0", NULL};
 static  char            *ttyfmts[]={"/dev/tty%d", "/dev/tty%02x", "/dev/tty%x", "/dev/tty%02d", NULL};
 static  int             cttyname = 0;
 static  int             originaltty;
@@ -40,7 +40,7 @@ FBVTopen(FB *f)
 
   /* Open current console */
 
-  while ( ( f->tty = open( ttynames[cttyname], O_WRONLY )) == -1 )
+  while ( ( f->tty = open( ttynames[cttyname], O_WRONLY ) ) == -1 )
   {
     FBerror( WARNING | SYSERR, "FBVTopen: open failed on %s",
              ttynames[cttyname]);
@@ -76,7 +76,7 @@ FBVTopen(FB *f)
   }
   else
   {
-    FBerror( FATAL | SYSERR, "FBVTopen: you are very lame - pass correct option!" );
+    FBerror( FATAL | SYSERR, "FBVTopen: please pass correct options!" );
   }
 
   /* Close current console */
@@ -208,9 +208,9 @@ FBfindFB( void )
 
   /* Open current console */
 
-  if ( ( curcon = open( ttynames[cttyname], O_RDONLY )) == -1 )
+  if ( ( curcon = open( ttynames[cttyname], O_RDONLY ) ) == -1 )
   {
-    FBerror( FATAL | SYSERR, "FBVTswitch: open failed on %s",
+    FBerror( FATAL | SYSERR, "FBfindFB: open failed on %s",
              ttynames[cttyname]);
   }
 
@@ -220,7 +220,7 @@ FBfindFB( void )
 
   if ( ioctl( curcon, VT_GETSTATE, &vts ) == -1 )
   {
-    FBerror( FATAL | SYSERR, "FBVTswitch: couldn't get VT state");
+    FBerror( FATAL | SYSERR, "FBfindFB: couldn't get VT state");
   }
 
   f = FBListFindKey( ttylist, vts.v_active );
@@ -229,7 +229,7 @@ FBfindFB( void )
 
   if ( close( curcon ) == -1 )
   {
-    FBerror( WARNING | SYSERR, "FBVTswitch: failed to close %s",
+    FBerror( WARNING | SYSERR, "FBfindFB: failed to close %s",
              ttynames[cttyname]);
   }
 
@@ -403,6 +403,21 @@ FBVTclose(FB *f)
   {
     FBerror( FATAL | SYSERR, "FBVTclose: couldn't switch to VT %d", originaltty);
   }
+  if ( ioctl( f->tty, VT_WAITACTIVE, originaltty ) == -1 )
+  {
+    FBerror( FATAL | SYSERR, "FBVTclose: couldn't wait for VT %d", originaltty);
+  }
+
+#if 0
+  /* Deallocate VT if we opened a new one */
+  if(f->vtchoice == FB_OPEN_NEW_VC)
+    {  
+      if(ioctl(f->tty, VT_DISALLOCATE, f->ttyno) == -1 )
+	{
+	  FBerror( WARNING | SYSERR, "FBVTclose: couldn't deallocate VT %d", f->ttyno);
+	}
+    }
+#endif
 
   /* Close VT */
 
