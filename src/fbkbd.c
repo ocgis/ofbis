@@ -27,9 +27,7 @@ get_keymaps (int fd) {
     ke.kb_table = i;
     j = ioctl(fd, KDGKBENT, (unsigned long)&ke);
     if (j && errno != EINVAL) {
-      fprintf(stderr, "KDGKBENT at index 0 in table %d: ", i);
-      perror("");
-      exit(1);
+      FBerror(FATAL | SYSERR, "KDGKBENT at index 0 in table %d: ", i);
     }
     
     if (!j && (ke.kb_value != K_NOSUCHMAP)) {
@@ -37,9 +35,11 @@ get_keymaps (int fd) {
     }
   }
 
+  /*
   fprintf (stderr,
            "ofbis: fbkbd.c: get_keymaps: number_of_keymaps=%d\n",
            number_of_keymaps);
+  */
 }
 
 
@@ -113,10 +113,8 @@ translate_key (int  fd,
   ke.kb_index = index;
   ke.kb_table = table;
   if (ioctl(fd, KDGKBENT, (unsigned long)&ke)) {
-    fprintf(stderr, "KDGKBENT at index %d in table %d: ",
+    FBerror(FATAL | SYSERR, "KDGKBENT at index %d in table %d: ",
             index, table);
-    perror("");
-    exit(1);
   }
   return ke.kb_value;
 }

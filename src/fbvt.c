@@ -335,10 +335,10 @@ FBVTswitch(int s)
       (void) memcpy( f->sbuf, f->sbak, f->finf.smem_len );
       
       /* Free backing store */
-      fprintf (stderr, "ofbis: FBclose: calling FBfree with sbak = %p\n", f->sbak);
+      /*      fprintf (stderr, "ofbis: FBclose: calling FBfree with sbak = %p\n", f->sbak); */
       
       FBfree (f->sbak);
-      fprintf (stderr, "ofbis: FBclose: called FBfree with sbak = %p\n", f->sbak);
+      /*      fprintf (stderr, "ofbis: FBclose: called FBfree with sbak = %p\n", f->sbak); */
       f->sbak=NULL;
     }
 

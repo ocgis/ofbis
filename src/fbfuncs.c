@@ -139,9 +139,11 @@ setplanes8( FB *f )
 void
 FBsetfuncs( FB *f )
 {
+  /*
   fprintf(stderr, "finf.type: %d\n", f->finf.type);
   fprintf(stderr, "finf.visual: %d\n", f->finf.visual);
   fprintf(stderr, "vinf.bits_per_pixel: %d\n", f->vinf.bits_per_pixel);
+  */
 
   switch(f->finf.type) { /* FB_TYPE_* */
   case FB_TYPE_INTERLEAVED_PLANES:
