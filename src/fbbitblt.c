@@ -80,13 +80,13 @@
 void
 sp8_bitblt( FB *f, FBBLTPBLK *fbb )
 {
-  void *sbase, *dbase;
+  char *sbase, *dbase;
   int hcnt;
-  sbase = (void *) (fbb->s_form + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
-  dbase = (void *) (fbb->d_form + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
+  sbase = (char *) (fbb->s_form + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
+  dbase = (char *) (fbb->d_form + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
 
   for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
-    memcpy(dbase, sbase, fbb->b_wd);
+    memcpy((void *) dbase, (void *) sbase, fbb->b_wd);
     sbase += fbb->s_nxln;
     dbase += fbb->d_nxln;
   }
@@ -450,6 +450,13 @@ FBgetbltpblk( FB *f )
 			fbb->s_nxln = fbb->d_nxln = EVENWORD(f->vinf.xres_virtual) * 2;
 			fbb->s_nxpl = fbb->d_nxpl = EVENWORD(f->vinf.xres_virtual) * 2 *
 			     f->vinf.yres_virtual;
+			break;
+		/* not sure what's correct or not here - Stefan*/
+		case FB_TYPE_PACKED_PIXELS:
+			fbb->s_nxwd = fbb->d_nxwd = f->vinf.bits_per_pixel * 2;
+			fbb->s_nxln = fbb->d_nxln = (f->vinf.xres_virtual * 
+						     f->vinf.bits_per_pixel)/8;
+			fbb->s_nxpl = fbb->d_nxpl = 2;
 			break;
 
 		/* not sure what to have when type is not any of the above */
