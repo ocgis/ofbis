@@ -13,7 +13,12 @@ FBmap(FB *f)
 #ifdef FB_ACCEL_SUN_CGSIX
   /* Some cards need a special mmap with offset */
   if(f->finf.accel == FB_ACCEL_SUN_CGSIX)
-    offset = 0x70000000 + 0x16000;  
+    offset = 0x70000000 + 0x16000;
+#endif
+#ifdef FB_ACCEL_SUN_CGTHREE
+  /* Some cards need a special mmap with offset */
+  if(f->finf.accel == FB_ACCEL_SUN_CGTHREE)
+    offset = 0x04000000; /* Untested!! */
 #endif
 
 	/* Map fb into memory */
