@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
+#include <errno.h> /* for errno variable */
+#include <string.h> /* for strerror */
 #include "mouse.h"
 #include "error.h"
 
@@ -53,11 +55,34 @@ void
 FBprocessmouse( FBMOUSEEVENT *ev )
 {
 	char	buf[6];
-	int size_to_read = (devtype==DEV_TYPE_GPMDATA?6:3);
-
-	if ( read( msefd, &buf, size_to_read ) == -1 )
+	int n, bytes_read = 0, size_to_read = (devtype==DEV_TYPE_GPMDATA?6:3);
+	
+	while ( size_to_read > 0 )
 	{
-		return;
+		n = read( msefd, &buf[bytes_read], size_to_read );
+		if ( n == -1 )
+		{
+			if ( errno == EAGAIN )
+			{
+				/* No data was immediately available for reading. */
+				/* We'll keep trying. */
+			}
+			else
+			{
+				FBerror( WARNING, strerror( errno ) );
+				return;
+			}
+		}
+		else if ( n == 0 )
+		{
+			FBerror( FATAL | SYSERR, "End-of-file occurred while reading from mouse device" );
+			return;
+		}
+		else
+		{
+			bytes_read += n;
+			size_to_read -= n;
+		}
 	}
 
 	if(devtype == DEV_TYPE_GPMDATA) {
