@@ -3,7 +3,6 @@
 #include "libfb.h"
 #include "fballoc.h"
 #include "fbchar.h"
-#include "fonts/fonts.h"
 
 #define	MIN(a,b)	( (a) < (b) ? (a) : (b) )
 #define MAX(a,b)	( (a) > (b) ? (a) : (b) )
