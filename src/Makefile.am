@@ -8,7 +8,7 @@ libofbis_la_SOURCES = \
 	fballoc.c fbbitblt.c fbchar.c fbcmap.c fbconvert.c fbdebug.c fberror.c \
 	fbevent.c fbfuncs.c fbhline.c fbkbd.c fbline.c fbmouse.c fbopen.c \
 	fbpixel.c fbset.c fbvt.c fbmmap.c \
-	font_6x11.c font_8x8.c font_8x16.c \
+	font_6x11.c font_8x8.c font_8x14.c font_8x16.c \
 	fballoc.h fbconvert.h fberror.h fbhline.h fbkeytbl.h fbmmap.h fbvt.h \
 	fbbitblt.h fbevent.h fbkbd.h fbline.h fbmouse.h fbchar.h fbfuncs.h \
 	fbkeys.h fblist.h fbpixel.h
