@@ -61,7 +61,7 @@ FBprocessmouse( FBMOUSEEVENT *ev )
 	}
 
 	if(devtype == DEV_TYPE_GPMDATA) {
-	  buf[0] = ~buf[0];
+	  buf[0] = buf[0];
 	  buf[1] = buf[3]*2;
 	  buf[2] = buf[4]*2;
 	}
