@@ -1,4 +1,17 @@
-Latest version is 0.0.9
+Latest version is 0.0.10
+
+1999-12-07	Tomas Berndtsson
+		Make characters non-transparent by default. Highest bit in the
+		background colour makes them transparent.
+		FBc24_to_cnative() and FBcnative_to_c24() is better implemented
+		using best match or palette lookup.
+		Fixed bug in FBerror which could cause eternal loop.
+		Set palette for direct and true colour.
+		Real XOR on pixels and lines for non-palette modes.
+		Use /dev/console by default, not /dev/tty0.
+		Use ISO-8859-1 fonts as defaults, sizes 8x8, 8x14 and 8x16.
+
+0.0.9
 
 1999-07-20      Tomas Berndtsson
                 Compile fix for glibc2.0.
