@@ -89,11 +89,11 @@ void copyline(char *dst, char *src, size_t num, int dir, int logicop)
   
   if (dir == BITBLT_FORWARD) {
     for(i=0; i<num; i++) {
-      LOGICOP((int)dst[i], (int)src[i], 0x3);
+      LOGICOP((int)dst[i], (int)src[i], logicop);
     }
   } else {
     for(i=num-1; i>=0; i--) {
-      LOGICOP((int)dst[i], (int)src[i], 0x3);
+      LOGICOP((int)dst[i], (int)src[i], logicop);
     }
   }
 }
@@ -116,22 +116,56 @@ pp_bitblt( FB *f, FBBLTPBLK *fbb )
    * are pointing to overlapping areas
    */
 
-  /* checking ultimate example */
-  if (sbase < dbase) {
-    tsbase = sbase + fbb->s_nxln * (fbb->b_ht-1);
-    tdbase = dbase + fbb->d_nxln * (fbb->b_ht-1);
-    for(hcnt = fbb->b_ht-1; hcnt >= 0; hcnt--) {
-      copyline(tdbase, tsbase, (fbb->b_wd * fbb->plane_ct) / 8,
-	       BITBLT_BACKWARD, fbb->op_tab);
-      tsbase -= fbb->s_nxln;
-      tdbase -= fbb->d_nxln;
+  /* If the logic operations aren't used, we can speed up the
+   * process a lot by using memmove() and memcpy().
+   */
+  if((fbb->op_tab & 0xf) == 0x3) {
+    /* Special optimized case if the bitblt covers the whole width. */
+    if(fbb->b_wd == f->vinf.xres_virtual &&
+       fbb->s_nxln == fbb->d_nxln &&
+       fbb->s_nxln == f->vinf.xres_virtual) {
+      if(sbase < dbase) {
+	memmove(dbase, sbase, (fbb->b_wd * fbb->b_ht * fbb->plane_ct) / 8);
+      } else if (sbase > dbase) {
+	memcpy(dbase, sbase, (fbb->b_wd * fbb->b_ht * fbb->plane_ct) / 8);
+      }
+      return;
     }
-  } else if (sbase > dbase) {
-    for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
-      copyline(dbase, sbase, (fbb->b_wd * fbb->plane_ct) / 8,
-	       BITBLT_FORWARD, fbb->op_tab);
-      sbase += fbb->s_nxln;
-      dbase += fbb->d_nxln;
+
+    /* checking ultimate example */
+    if (sbase < dbase) {
+      tsbase = sbase + fbb->s_nxln * (fbb->b_ht-1);
+      tdbase = dbase + fbb->d_nxln * (fbb->b_ht-1);
+      for(hcnt = fbb->b_ht-1; hcnt >= 0; hcnt--) {
+	memmove(tdbase, tsbase, (fbb->b_wd * fbb->plane_ct) / 8);
+	tsbase -= fbb->s_nxln;
+	tdbase -= fbb->d_nxln;
+      }
+    } else if (sbase > dbase) {
+      for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
+	memcpy(dbase, sbase, (fbb->b_wd * fbb->plane_ct) / 8);
+	sbase += fbb->s_nxln;
+	dbase += fbb->d_nxln;
+      }
+    }
+  } else {
+    /* checking ultimate example */
+    if (sbase < dbase) {
+      tsbase = sbase + fbb->s_nxln * (fbb->b_ht-1);
+      tdbase = dbase + fbb->d_nxln * (fbb->b_ht-1);
+      for(hcnt = fbb->b_ht-1; hcnt >= 0; hcnt--) {
+	copyline(tdbase, tsbase, (fbb->b_wd * fbb->plane_ct) / 8,
+		 BITBLT_BACKWARD, fbb->op_tab & 0xf);
+	tsbase -= fbb->s_nxln;
+	tdbase -= fbb->d_nxln;
+      }
+    } else if (sbase > dbase) {
+      for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
+	copyline(dbase, sbase, (fbb->b_wd * fbb->plane_ct) / 8,
+		 BITBLT_FORWARD, fbb->op_tab & 0xf);
+	sbase += fbb->s_nxln;
+	dbase += fbb->d_nxln;
+      }
     }
   }
 }
