@@ -1,5 +1,5 @@
 #
-# oFBLIBis toplevel makefile
+# oFBis toplevel makefile
 #
 
 # select whether to support debugging ('yes' or 'no')
@@ -116,7 +116,8 @@ tar:
 	cd ..; tar cvzf $(notdir $(shell pwd)).tar.gz \
 		`find $(notdir $(shell pwd)) -type f -a ! -name '*.[oa]' \
 		-a ! -name .depend -a ! -name fbtst -a ! -name 'optiondef.[ch]' \
-		-a ! -name '*~' -a ! -name '*.orig' -a ! -name 'libfb.so*'`
+		-a ! -name '*~' -a ! -name '*.orig' -a ! -name 'libfb.so*' \
+		| grep -v '/CVS/'`
 
 force:
 
