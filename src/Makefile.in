@@ -77,9 +77,10 @@ fb_HEADERS = libfb.h
 
 # Make a shared library using libtool
 lib_LTLIBRARIES = libfb.la
-libfb_la_SOURCES = fbopen.c fberror.c fbpixel.c fbdebug.c fbset.c fbcmap.c \
-	fbvt.c fballoc.c fbbitblt.c fbfuncs.c fbhline.c fbline.c fbkbd.c \
-	fbmouse.c fbevent.c fbchar.c font_6x11.c font_8x8.c font_8x16.c \
+libfb_la_SOURCES = \
+	fballoc.c fbbitblt.c fbchar.c fbcmap.c fbdebug.c fberror.c fbevent.c \
+	fbfuncs.c fbhline.c fbkbd.c fbline.c fbmouse.c fbopen.c fbpixel.c \
+	fbset.c fbvt.c font_6x11.c font_8x8.c font_8x16.c \
 	fballoc.h fberror.h fbhline.h fbkeytbl.h fbmmap.h fbvt.h \
 	fbbitblt.h fbevent.h fbkbd.h fbline.h fbmouse.h fbchar.h fbfuncs.h \
 	fbkeys.h fblist.h fbpixel.h
@@ -98,9 +99,9 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfb_la_LIBADD = 
-libfb_la_OBJECTS =  fbopen.lo fberror.lo fbpixel.lo fbdebug.lo fbset.lo \
-fbcmap.lo fbvt.lo fballoc.lo fbbitblt.lo fbfuncs.lo fbhline.lo \
-fbline.lo fbkbd.lo fbmouse.lo fbevent.lo fbchar.lo font_6x11.lo \
+libfb_la_OBJECTS =  fballoc.lo fbbitblt.lo fbchar.lo fbcmap.lo \
+fbdebug.lo fberror.lo fbevent.lo fbfuncs.lo fbhline.lo fbkbd.lo \
+fbline.lo fbmouse.lo fbopen.lo fbpixel.lo fbset.lo fbvt.lo font_6x11.lo \
 font_8x8.lo font_8x16.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)

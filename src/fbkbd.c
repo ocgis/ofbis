@@ -70,8 +70,9 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
 	int		pressed = ( ( 0x80 & key ) ? FALSE : TRUE );
 	static int	state = 0;
 
-	/*printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
-	printf("State before is %x\n", state);*/
+	printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
+	printf("State before is %x\n", state);
+	printf("Key is 0x%04x\n", key);
 	switch (scancode)
 	{
 	case KEY_ShiftR:	SETORCLEAR(Mode_RShift)	break;

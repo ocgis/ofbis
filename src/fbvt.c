@@ -192,9 +192,11 @@ FBVTopen(FB *f)
 
 	ttylist = FBListAdd( ttylist, f->ttyno, f );
 
-	/* Initialise kbd handling */
+	if (f->handle_kbd) {
+	  /* Initialise kbd handling */
 
-	FBkbdopen( f );
+	  FBkbdopen( f );
+	}
 }
 
 FB *
@@ -341,9 +343,11 @@ FBVTswitchfb(FB *f)
 void
 FBVTclose(FB *f)
 {
-	/* Close keyboard */
+        if (f->handle_kbd) {
+	  /* Close keyboard */
 
-	FBkbdclose( f );
+	  FBkbdclose( f );
+	}
 
 	/* If backing store allocated, free it */
 

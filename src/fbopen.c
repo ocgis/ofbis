@@ -21,7 +21,8 @@ FBopen( const char *fbname, unsigned short opts )
   
   /* Set open options */
   
-  f->vtchoice = opts & 1;
+  f->vtchoice = opts & 0x01;
+  f->handle_kbd = (opts & FB_NO_KBD) == 0;
   f->keeptty = FALSE;
   
   /* Open framebuffer fbname */

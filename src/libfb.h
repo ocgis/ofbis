@@ -59,6 +59,7 @@ struct fbinf
 	int				tty;		/* tty file desc. */
 	int				ttyno;		/* VT number */
 	unsigned short			vtchoice;	/* Current VT or new one? */
+        unsigned short                  handle_kbd;     /* Open raw kbd and handle vt switching? */
 	unsigned short			keeptty;	/* Keep current tty (debug) */
 	unsigned short			visible;	/* Is VT visible? */
 	unsigned short			drawing;	/* Drawing now? */
@@ -92,6 +93,7 @@ struct fbinf
 
 #define	FB_KEEP_CURRENT_VC	0x0000
 #define	FB_OPEN_NEW_VC		0x0001
+#define FB_NO_KBD               0x0002
 
 FB	*FBopen(const char *fbname, unsigned short opts);
 int	FBclose(FB *f);

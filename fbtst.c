@@ -6,7 +6,7 @@
 
 #define BLITTEST
 #define CHARTEST
-#undef CMAPTEST
+#define CMAPTEST
 #undef EVENTTEST
 
 #define max(a,b) ((a)>(b)?(a):(b))
@@ -58,9 +58,17 @@ main( int argc, char **argv )
   int    k;
 #endif 
 
-  if ((f=FBopen(NULL,FB_OPEN_NEW_VC /*FB_KEEP_CURRENT_VC*/))==NULL) {
+#ifdef EVENTTEST
+#define FB_OPT FB_OPEN_NEW_VC
+#else
+#define FB_OPT FB_OPEN_NEW_VC | FB_NO_KBD
+#endif
+
+  if ((f=FBopen(NULL,FB_OPT /*FB_KEEP_CURRENT_VC*/))==NULL) {
     printf("FBinit f failed");
   }
+
+  fprintf (stderr, "xres_virtual=%d\n", f->vinf.xres_virtual);
 
   setup_signals();
   
@@ -257,14 +265,16 @@ main( int argc, char **argv )
 
 #ifdef EVENTTEST
   {
+    int  i = 0;
     char ch;
-    fprintf(stderr, "fbtst: before FBgetevent\n");
+    fprintf(stderr, "fbtst: before FBgetchar\n");
 
-    while ((ch=FBgetchar(f)) != 'a') {
+    while (((ch=FBgetchar(f)) != 'a') && (i < 5)) {
       fprintf(stderr, "fbtst: char=0x%x %c\n", ch, ch);
+      i++;
     }
 
-    fprintf(stderr, "fbtst: after FBgetevent\n");
+    fprintf(stderr, "fbtst: after FBgetchar\n");
   }
 #else
   sleep (5);

@@ -58,7 +58,7 @@ settruecolor( FB *f )
 
 static
 void
-setstaticpseudocolor ( FB *f )
+setpackedpixel8 ( FB *f )
 {
   f->putpixel = &ppspc;
   f->getpixel = &gpspc;
@@ -107,6 +107,13 @@ setplanes8( FB *f )
 	f->putchar = &plpc8;
 }
 
+
+/*
+** Description
+** Setup which functions to use for standard operations
+**
+** 1998-08-08 CG
+*/
 void
 FBsetfuncs( FB *f )
 {
@@ -136,16 +143,17 @@ FBsetfuncs( FB *f )
 	    setinterleave1(f);
 	    break;
 
-	  case FB_VISUAL_PSEUDOCOLOR:
-	    setinterleave1(f);
-	    break;
-
 	  case FB_VISUAL_TRUECOLOR:
 	    settruecolor(f);
 	    break;
 	  
+	  case FB_VISUAL_PSEUDOCOLOR:
 	  case FB_VISUAL_STATIC_PSEUDOCOLOR:
-	    setstaticpseudocolor (f);
+	    /*
+	    ** TBD
+	    ** Check bits per pixel and call the right setup function
+	    */
+	    setpackedpixel8 (f);
 	    break;
 
 	  default:
