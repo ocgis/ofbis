@@ -89,7 +89,7 @@ pp_bitblt( FB *f, FBBLTPBLK *fbb )
   int hcnt;
 
   for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
-    memcpy((void *) dbase, (void *) sbase, (fbb->b_wd * fbb->plane_ct) / 8);
+    memmove((void *) dbase, (void *) sbase, (fbb->b_wd * fbb->plane_ct) / 8);
     sbase += fbb->s_nxln;
     dbase += fbb->d_nxln;
   }
