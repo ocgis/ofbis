@@ -1,3 +1,9 @@
+2003-09-17  Tomas Skäre  <tomas@nocrew.org>
+
+	* Released version 0.2.0 with changes by
+	  Guillem Jover <guillem@debian.org> to run oFBis as
+	  non-root user.
+
 2000-10-18  Tomas Berndtsson  <tomas@nocrew.org>
 
 	* Released version 0.1.1.
