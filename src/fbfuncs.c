@@ -7,6 +7,7 @@
 #include "fbbitblt.h"
 #include "fbchar.h"
 #include "fbconvert.h"
+#include "fbfuncs.h"
 
 static void
 setinterleave1( FB *f )

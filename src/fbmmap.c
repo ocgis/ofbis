@@ -1,8 +1,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include "ofbis.h"
 #include "fberror.h"
+#include "fbmmap.h"
+#include "ofbis.h"
 
 void
 FBmap(FB *f)

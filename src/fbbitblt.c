@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "ofbis.h"
 #include "fballoc.h"
+#include "fbbitblt.h"
 #include "fbevent.h"	/* for debugging */
 
 /* 0, 1, 2 or 3 */
@@ -88,14 +89,15 @@ void copyline(char *dst, const char *src, size_t num, int dir, int logicop)
   
   if (dir == BITBLT_FORWARD) {
     for(i=0; i<num; i++) {
-      LOGICOP(dst[i], src[i], 0x3);
+      LOGICOP((int)dst[i], (int)src[i], 0x3);
     }
   } else {
     for(i=num-1; i>=0; i--) {
-      LOGICOP(dst[i], src[i], 0x3);
+      LOGICOP((int)dst[i], (int)src[i], 0x3);
     }
   }
 }
+
 
 void
 pp_bitblt( FB *f, FBBLTPBLK *fbb )
@@ -134,23 +136,6 @@ pp_bitblt( FB *f, FBBLTPBLK *fbb )
   }
 }
 
-void
-old_pp_bitblt( FB *f, FBBLTPBLK *fbb )
-{
-  unsigned char *sbase = ((__u8 *) fbb->s_form) + 
-			  (fbb->s_xmin * fbb->plane_ct) / 8 + 
-			  (fbb->s_ymin * fbb->s_nxln);
-  unsigned char *dbase = ((__u8 *) fbb->d_form) + 
-			  (fbb->d_xmin * fbb->plane_ct) / 8 + 
-			  (fbb->d_ymin * fbb->d_nxln);
-  int hcnt;
-
-  for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
-    memmove((void *) dbase, (void *) sbase, (fbb->b_wd * fbb->plane_ct) / 8);
-    sbase += fbb->s_nxln;
-    dbase += fbb->d_nxln;
-  }
-}
 
 void 
 bitblt( FB *f, FBBLTPBLK *fbb )
