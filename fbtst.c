@@ -6,7 +6,7 @@
 
 #define BLITTEST
 #define CHARTEST
-#define CMAPTEST
+#undef CMAPTEST
 #define EVENTTEST
 
 #define max(a,b) ((a)>(b)?(a):(b))
