@@ -6,6 +6,14 @@
 #include <sys/time.h>
 #include <linux/fb.h>
 
+/* Options for FBsetwritemode */
+typedef enum {
+  FB_REPLACE,
+  FB_TRANS,
+  FB_XOR,
+  FB_ERASE
+} FBWRITEMODE;
+
 typedef struct fbcmap
 {
   int              start;
@@ -21,36 +29,36 @@ typedef struct fbinf FB;
 /* bitblt declarations */
 typedef struct  bbpb
 {
-  unsigned short        b_wd;           /* width of block to blit (pixels) */
-  unsigned short        b_ht;           /* height of block to blit (pixels) */
-  unsigned short        plane_ct;       /* number of planes to blit */
-  unsigned short        fg_col;         /* foreground colour */
-  unsigned short        bg_col;         /* background colour */
-  unsigned int  op_tab;         /* logic op table */
-  unsigned short        s_xmin;         /* minimum X source */
-  unsigned short        s_ymin;         /* minimum Y source */
-  unsigned short        *s_form;        /* source form base addr */
-  unsigned short        s_nxwd;         /* offset to next word in line (bytes) */
-  unsigned short        s_nxln;         /* offset to next line in plane (bytes) */
-  unsigned short        s_nxpl;         /* offset from start of current plane to next plane */
-  unsigned short        d_xmin;         /* minimum X destination */
-  unsigned short        d_ymin;         /* minimum Y destination */
-  unsigned short        *d_form;        /* destination form base addr */
-  unsigned short        d_nxwd;         /* offset to next word in line (bytes) */
-  unsigned short        d_nxln;         /* offset to next line in plane (bytes) */
-  unsigned short        d_nxpl;         /* offset from start of current plane to next plane */
-  unsigned short        *p_addr;        /* address of pattern buffer */
-  unsigned short        p_nxln;         /* offset to next line in pattern (bytes) */
-  unsigned short        p_nxpl;         /* offset to next plane in pattern (bytes) */
-  unsigned short        p_mask;         /* pattern index mask */
-  unsigned short        space[12];      /* reserved */
+  unsigned short   b_wd;       /* width of block to blit (pixels) */
+  unsigned short   b_ht;       /* height of block to blit (pixels) */
+  unsigned short   plane_ct;   /* number of planes to blit */
+  unsigned short   fg_col;     /* foreground colour */
+  unsigned short   bg_col;     /* background colour */
+  unsigned int     op_tab;     /* logic op table */
+  unsigned short   s_xmin;     /* minimum X source */
+  unsigned short   s_ymin;     /* minimum Y source */
+  unsigned short * s_form;     /* source form base addr */
+  unsigned short   s_nxwd;     /* offset to next word in line (bytes) */
+  unsigned short   s_nxln;     /* offset to next line in plane (bytes) */
+  unsigned short   s_nxpl;     /* offset from start of current plane to next */
+  unsigned short   d_xmin;     /* minimum X destination */
+  unsigned short   d_ymin;     /* minimum Y destination */
+  unsigned short * d_form;     /* destination form base addr */
+  unsigned short   d_nxwd;     /* offset to next word in line (bytes) */
+  unsigned short   d_nxln;     /* offset to next line in plane (bytes) */
+  unsigned short   d_nxpl;     /* offset from start of current plane to next */
+  unsigned short * p_addr;     /* address of pattern buffer */
+  unsigned short   p_nxln;     /* offset to next line in pattern (bytes) */
+  unsigned short   p_nxpl;     /* offset to next plane in pattern (bytes) */
+  unsigned short   p_mask;     /* pattern index mask */
+  unsigned short   space[12];  /* reserved */
 } FBBLTPBLK;
 
 typedef struct fbblock
 {
-  void		*addr;		/* Pointer to start of data block */
-  int		width;		/* Width of block */
-  int		height;		/* Height of block */
+  void          *addr;          /* Pointer to start of data block */
+  int           width;          /* Width of block */
+  int           height;         /* Height of block */
 } FBBLOCK;
 
 typedef struct fbfont
@@ -79,16 +87,39 @@ struct fbinf
   struct fb_var_screeninfo vinf;           /* variable screen info */
   FBCMAP *                 cmap;           /* current colourmap */
   FBFONT *                 font;           /* current font */
+  FBWRITEMODE              writemode;      /* writemode */
 
   /* Drawing functions */
 
-  void          (*putpixel)     (FB *f, unsigned short x, unsigned short y, unsigned long col);
-  unsigned long (*getpixel)     (FB *f, unsigned short x, unsigned short y);
-  void          (*hline)        (FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned long col);
-  void          (*line)         (FB *f, unsigned short x1, unsigned short x2, unsigned short y1, unsigned short y2, unsigned long col);
-  void          (*bitblt)       (FB *f, FBBLTPBLK *fbb);
-  void          (*putchar)      (FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch);
-  void		(*sp8_convert)	(FB *f, FBBLOCK *srcblock, FBBLOCK *dstblock);
+  void          (*putpixel) (FB *           f,
+                             unsigned short x,
+                             unsigned short y,
+                             unsigned long  col);
+  unsigned long (*getpixel) (FB *           f,
+                             unsigned short x,
+                             unsigned short y);
+  void          (*hline)    (FB *           f,
+                             unsigned short x1,
+                             unsigned short x2,
+                             unsigned short y,
+                             unsigned long  col);
+  void          (*line)     (FB *           f,
+                             unsigned short x1,
+                             unsigned short x2,
+                             unsigned short y1,
+                             unsigned short y2,
+                             unsigned long  col);
+  void          (*bitblt)   (FB *        f,
+                             FBBLTPBLK * fbb);
+  void          (*putchar)  (FB *f,
+                             unsigned short x,
+                             unsigned short y,
+                             unsigned long  fgcol,
+                             unsigned long  bgcol,
+                             unsigned char  ch);
+  void          (*sp8_convert) (FB *      f,
+                                FBBLOCK * srcblock,
+                                FBBLOCK * dstblock);
 };
 
 /* misc defines */
@@ -121,6 +152,9 @@ extern unsigned short switching;
 
 /* lowlevel drawing functions */
 
+void FBsetwritemode (FB *        f,
+                     FBWRITEMODE mode);
+
 #define FB_ATOMIC(f,x)          { f->drawing=TRUE; x; f->drawing=FALSE; if (switching) FBVTswitch(0); }
 
 #define FBputpixel(f,x,y,col)   FB_ATOMIC(f,(*(f->putpixel))(f,x,y,col))
@@ -137,7 +171,7 @@ FBgetpixel( FB *f, unsigned short x, unsigned short y)
 
 #define FBputchar(f,x,y,fgcol,bgcol,ch) FB_ATOMIC(f,(*(f->putchar))(f,x,y,fgcol,bgcol,ch))
 
-#define	FBchunk_to_native(f,srcblock,dstblock)	FB_ATOMIC(f,(*(f->sp8_convert))(f,srcblock,dstblock))
+#define FBchunk_to_native(f,srcblock,dstblock)  FB_ATOMIC(f,(*(f->sp8_convert))(f,srcblock,dstblock))
 
 /* screen settings functions */
 

@@ -86,6 +86,9 @@ FBopen( const char *fbname, unsigned short opts )
   FBmap(f);
   f->sbak = NULL;
 
+  fprintf (stderr, "sbuf = %p\n", f->sbuf);
+  fprintf (stderr, "smem_len = %ld\n", f->finf.smem_len);
+
   return(f);
 }
 

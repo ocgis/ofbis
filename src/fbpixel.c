@@ -80,17 +80,25 @@ pptc( FB *f, unsigned short x, unsigned short y, unsigned long col )
 ** Maybe it needs to be fixed for larger colourdepths.
 **
 ** 1998-08-06 CG
+** 1998-12-26 CG
 */
 void
-ppspc (FB *f,
+ppspc (FB *           f,
        unsigned short x,
        unsigned short y,
-       unsigned long col)
+       unsigned long  col)
 {
   register unsigned char *pixel =
     (unsigned char *)f->sbuf + ((y * f->vinf.xres_virtual)+x);
 
-  *pixel = (unsigned char)col;
+  switch (f->writemode) {
+  case FB_XOR:
+    *pixel ^= (unsigned char)col;
+    break;
+
+  default:
+    *pixel = (unsigned char)col;
+  }
 }
 
 

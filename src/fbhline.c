@@ -120,21 +120,34 @@ hltc( FB *f, unsigned short x1, unsigned short x2, unsigned short y, unsigned lo
 ** To be done
 ** This function only works for a colourdepth of 8 (one byte per pixel) and
 ** needs to be updated for larger colourdepths.
+**
+** 1998-12-26 CG
 */
 void
-hlspc(FB *f,
+hlspc(FB *           f,
       unsigned short x1,
       unsigned short x2,
       unsigned short y,
-      unsigned long col)
+      unsigned long  col)
 {
   register unsigned short	x = MIN(x1,x2);
   register unsigned short	j = MAX(x1,x2);
   register unsigned char	*pixel =
     (char *)f->sbuf + ((y*f->vinf.xres_virtual) + x);
-  
-  while (x++ <= j) {
-    *pixel++ = (unsigned char)col;
+
+  /* FIXME
+  ** Maybe there should be individual functions that are set in FB instead? */
+  switch (f->writemode) {
+  case FB_XOR:
+    while (x++ <= j) {
+      *pixel++ ^= (unsigned char)col;
+    }
+    break;
+
+  default:
+    while (x++ <= j) {
+      *pixel++ = (unsigned char)col;
+    }
   }
 }
 

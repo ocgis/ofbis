@@ -56,3 +56,15 @@ FBputvar( FB *f )
 	}
 	FBsetfuncs(f);
 }
+
+/*
+** Description
+** Set writemode for graphical operations
+**
+** 1998-12-26 CG
+*/
+void
+FBsetwritemode (FB *        f,
+                FBWRITEMODE mode) {
+  f->writemode = mode;
+}

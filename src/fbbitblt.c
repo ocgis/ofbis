@@ -84,9 +84,9 @@
 static __inline__
 void copyline(char *dst, const char *src, size_t num, int dir, int logicop)
 {
-  int i;
+  register int i;
   
-  if(dir) {
+  if (dir == BITBLT_FORWARD) {
     for(i=0; i<num; i++) {
       LOGICOP(dst[i], src[i], 0x3);
     }
@@ -115,9 +115,7 @@ pp_bitblt( FB *f, FBBLTPBLK *fbb )
    */
 
   /* checking ultimate example */
-  if(sbase == dbase) 
-    return;
-  if(sbase < dbase) {
+  if (sbase < dbase) {
     tsbase = sbase + fbb->s_nxln * (fbb->b_ht-1);
     tdbase = dbase + fbb->d_nxln * (fbb->b_ht-1);
     for(hcnt = fbb->b_ht-1; hcnt >= 0; hcnt--) {
@@ -126,7 +124,7 @@ pp_bitblt( FB *f, FBBLTPBLK *fbb )
       tsbase -= fbb->s_nxln;
       tdbase -= fbb->d_nxln;
     }
-  } else {
+  } else if (sbase > dbase) {
     for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
       copyline(dbase, sbase, (fbb->b_wd * fbb->plane_ct) / 8,
 	       BITBLT_FORWARD, fbb->op_tab);
