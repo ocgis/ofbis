@@ -1,0 +1,15 @@
+* Before compiling, be sure that you use 2.1.x kernel include files. The
+* library still works, at least for me, with 2.0.x kernels, but needs 2.1.x 
+* include files to compile. - Tomas Berndtsson
+
+Just type "make" from the main directory, and that's it. "make install" is
+not well made, but works.
+If you are developing this, type "make dep" before you type make for complete
+dependencies.
+
+Internal library memory leak checking can be enabled/disabled by the #define in
+fballoc.h. At the moment it is set on.
+
+Please see doc/ofbis.doc for a programming reference.
+
+Please see DESIGN before adding/changing anything in this library.

@@ -1,0 +1,24 @@
+Thanks to the following people for their assistance with developing
+the library:
+
+Software Development
+====================
+
+Stefan Berndtsson: TGA viewer viewtga
+James Troup: GIF viewer jifview
+Tomas Berndtsson: Various demos and HP scanning tool hpscanfb
+
+Testing
+=======
+
+Amiga: Michael Goodwin
+Atari: Dave Cook, Nicholas Flintham, Witek Wnuk
+
+Advice
+======
+
+Amiga: Geert Uytterhoeven, Roman Zippel, Jes Degn Soerensen
+Atari: Elias Martenson, Lars Brinkhoff and NoCrew
+
+Martin Mitchell
+7/10/96

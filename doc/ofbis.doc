@@ -1,0 +1,129 @@
+Framebuffer Library Programming Reference
+=========================================
+
+N.B. Tabsize for this and all libfb files is 8, like linux.
+
+A minimal framebuffer program would have something like:
+
+	{
+		FB *f;
+
+		f = FBopen( NULL, FB_OPEN_NEW_VC );
+		...
+		/* draw/do things here */
+		...
+		FBclose( f );
+	}
+
+Library startup/exit
+====================
+
+FB *FBopen( const char *fbname, unsigned short opts )
+-----------------------------------------------------
+
+FBopen is used to initialise the framebuffer library.
+
+fbname is the filename of the framebuffer to open (eg "/dev/fb1vga16") or it
+can be left as NULL to use either the value of the FRAMEBUFFER environment
+variable (if it is set) or if it is not, the current framebuffer device.
+opts is a series of options that must be ORed
+together if you select multiple options.
+
+Current options are:
+
+FB_KEEP_CURRENT_VC: The current console will be used for display.
+FB_OPEN_NEW_VC: The first available console will be opened and switched to for
+		display.
+The above two options are mutually exclusive.
+
+FB_LINEA: Enable the oFBis Line-A emulation. It is of little use except for oFBis.
+
+It returns a handle for the opened framebuffer.
+
+void FBclose( FB *f )
+---------------------
+
+FBclose shuts the framebuffer f, and if FB_OPEN_NEW_VC was selected when f was
+opened, switches to the console that was current when FBopen was called.
+
+Graphics functions
+==================
+
+void FBputpixel( FB *f, unsigned short x, unsigned short y, unsigned long col )
+-------------------------------------------------------------------------------
+
+FBputpixel draws a single point at (x,y) on framebuffer f, with colour col.
+
+unsigned long FBgetpixel( FB *f, unsigned short x, unsigned short y )
+---------------------------------------------------------------------
+
+FBgetpixel returns the colour value at the point (x,y) on framebuffer f.
+
+void FBhline( FB *f, unsigned short x1, unsigned short x2, unsigned short y,
+		unsigned long col )
+----------------------------------------------------------------------------
+
+FBhline draws a horizontal line on framebuffer f from (x1,y) to (x2,y) with
+colour col.
+
+void FBline( FB *f, unsigned short x1, unsigned short y1, unsigned short x2,
+		unsigned short y2, unsigned long col )
+----------------------------------------------------------------------------
+
+FBline draws a line from (x1,y1) to (x2,y2) on framebuffer f with colour col.
+
+void FBbitblt( FB *f, FBBLTPBLK *fbb)
+-------------------------------------
+
+FBbitblt blits a rectangular block from one memory area to another. It is
+not limited to the framebuffer area.
+
+void FBputchar( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, 
+		unsigned long bgcol, unsigned char ch )
+-------------------------------------------------------------------------------
+
+FBputchar puts one character, ch, at (x,y) with colour fgcol. bgcol is
+currently unused, and might be removed in a later version!
+
+Colourmap functions
+===================
+
+FBCMAP *FBgetcmap( FB *f )
+--------------------------
+
+FBgetcmap returns a new FBCMAP structure with the current colourmap of the
+framebuffer f. It may be overwritten with a new colourmap for setting with the
+FBputcmap function. Use FBfreecmap to free the colourmap allocated with this
+function.
+
+void FBputcmap( FB *f, FBCMAP *fbcmap )
+---------------------------------------
+
+FBputcmap installs the colourmap fbcmap on the framebuffer f. No error checking
+of the members of fbcmap is done. To set a single colour or a range of colours,
+set the start, end and len members of fbcmap appropriately.
+
+void FBfreecmap( FBCMAP *fbcmap )
+---------------------------------
+
+FBfreecmap frees the fbcmap allocated with FBgetcmap.
+
+Screen settings functions (likely to be made private)
+=====================================================
+
+void FBgetfix( FB *f )
+void FBgetvar( FB *f )
+void FBputvar( FB *f )
+
+These all correspond directly to the fixed and variable structures used with the
+linux framebuffer. Mainly used to simplify things at this early stage.
+
+Debug functions (likely to be made private)
+===========================================
+
+void FBfinfdump( FB *f )
+void FBvinfdump( FB *f )
+void FBcmapdump( FB *f )
+
+For library programming only. You can work them out. 8-)
+
