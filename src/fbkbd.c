@@ -9,7 +9,6 @@
 #include "fberror.h"
 #include "fbkbd.h"
 #include "fbkeys.h"
-#include "fbkeytbl.h"
 
 static  int             oldkbdmode;
 static  struct termios  oldttysets;
