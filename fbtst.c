@@ -51,7 +51,7 @@ main( int argc, char **argv )
 {
 #ifdef BLITTEST
   int	i,j=0;
-  long	c;
+  u_int32_t	c;
 #endif /* BLITTEST */
   
 #ifdef CMAPTEST
@@ -248,6 +248,7 @@ main( int argc, char **argv )
   FBputchar(f, fnt.width/2+fnt.width*2+x,fnt.height+y, FBc24_to_cnative(f, 0x00999999),0, 'l'); \
   FBputchar(f, fnt.width/2+fnt.width*3+x,fnt.height+y, FBc24_to_cnative(f, 0x00cccccc),0, 'e'); \
   FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, FBc24_to_cnative(f, 0x00ffffff),0, 's');
+
   {  
     FBFONT fnt;
     

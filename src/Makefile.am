@@ -1,3 +1,6 @@
+SUBDIRS = display_interleaved display_planes display_packed \
+	generic
+
 # Include files goes into a special directory
 ofbisdir = @OSISINCLUDE@
 ofbis_HEADERS = ofbis.h ofbis_keyboard.h
@@ -5,13 +8,18 @@ ofbis_HEADERS = ofbis.h ofbis_keyboard.h
 # Make a shared library using libtool
 lib_LTLIBRARIES = libofbis.la
 libofbis_la_SOURCES = \
-	fballoc.c fbbitblt.c fbchar.c fbcmap.c fbconvert.c fbdebug.c fberror.c \
-	fbevent.c fbfuncs.c fbhline.c fbkbd.c fbline.c fbmouse.c fbopen.c \
-	fbpixel.c fbset.c fbvt.c fbmmap.c \
-	font_6x11.c font_8x8.c font_8x14.c font_8x16.c \
-	fballoc.h fbconvert.h fberror.h fbhline.h fbmmap.h fbvt.h \
-	fbbitblt.h fbevent.h fbkbd.h fbline.h fbmouse.h fbchar.h fbfuncs.h \
-	fbkeys.h fblist.h fbpixel.h
+	alloc.c char.c cmap.c debug.c error.c \
+	event.c funcs.c kbd.c mouse.c open.c bitblt.c \
+	set.c vt.c mmap.c font_6x11.c font_8x8.c font_8x14.c font_8x16.c \
+	alloc.h error.h mmap.h vt.h \
+	event.h kbd.h mouse.h char.h funcs.h \
+	keys.h list.h
+
+libofbis_la_LIBADD = \
+	display_interleaved/libinterleaved.la \
+	display_planes/libplanes.la \
+	display_packed/libpacked.la \
+	generic/libgeneric.la
 
 # This is a bad versioning system, since much has changed
 # in the interface during its early development.

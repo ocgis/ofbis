@@ -96,31 +96,35 @@ struct fbinf
   /* Drawing functions */
 
   void          (*putpixel) (FB *           f,
-                             unsigned short x,
-                             unsigned short y,
-                             unsigned long  col);
-  unsigned long (*getpixel) (FB *           f,
-                             unsigned short x,
-                             unsigned short y);
+                             u_int16_t x,
+                             u_int16_t y,
+                             u_int32_t  col);
+  u_int32_t     (*getpixel) (FB *           f,
+                             u_int16_t x,
+                             u_int16_t y);
   void          (*hline)    (FB *           f,
-                             unsigned short x1,
-                             unsigned short x2,
-                             unsigned short y,
-                             unsigned long  col);
+                             u_int16_t x1,
+                             u_int16_t x2,
+                             u_int16_t y,
+                             u_int32_t  col);
   void          (*line)     (FB *           f,
-                             unsigned short x1,
-                             unsigned short x2,
-                             unsigned short y1,
-                             unsigned short y2,
-                             unsigned long  col);
+                             u_int16_t x1,
+                             u_int16_t x2,
+                             u_int16_t y1,
+                             u_int16_t y2,
+                             u_int32_t  col);
   void          (*bitblt)   (FB *        f,
                              FBBLTPBLK * fbb);
   void          (*putchar)  (FB *f,
-                             unsigned short x,
-                             unsigned short y,
-                             unsigned long  fgcol,
-                             unsigned long  bgcol,
+                             u_int16_t x,
+                             u_int16_t y,
+                             u_int32_t  fgcol,
+                             u_int32_t  bgcol,
                              unsigned char  ch);
+  u_int32_t     (*c24_to_cnative) (FB *f,
+				   u_int32_t col24);
+  u_int32_t     (*cnative_to_c24) (FB *f,
+				   u_int32_t col24);
   void          (*sp8_convert) (FB *      f,
                                 FBBLOCK * srcblock,
                                 FBBLOCK * dstblock);
@@ -159,13 +163,15 @@ extern unsigned short switching;
 void FBsetwritemode (FB *        f,
                      FBWRITEMODE mode);
 
-#define FB_ATOMIC(f,x)          { f->drawing=TRUE; x; f->drawing=FALSE; if (switching) FBVTswitch(0); }
+#define FB_ATOMIC(f,x) \
+	{ f->drawing=TRUE; x; f->drawing=FALSE; if (switching) FBVTswitch(0); }
+#define FB_ATOMIC_RETURN(f,x) \
+	{ u_int32_t ret; f->drawing=TRUE; ret=x; f->drawing=FALSE; if (switching) FBVTswitch(0); return ret; }
 
 #define FBputpixel(f,x,y,col)   FB_ATOMIC(f,(*(f->putpixel))(f,x,y,col))
 
-static inline unsigned long
-FBgetpixel( FB *f, unsigned short x, unsigned short y)
-{ unsigned long col; f->drawing=TRUE; col=(*(f->getpixel))(f,x,y); f->drawing=FALSE; if (switching) FBVTswitch(0); return col; }
+static inline u_int32_t
+FBgetpixel( FB *f, u_int16_t x, u_int16_t y) FB_ATOMIC_RETURN(f,(*(f->getpixel))(f,x,y))
 
 #define FBhline(f,x1,x2,y,col)  FB_ATOMIC(f,(*(f->hline))(f,x1,x2,y,col))
 
@@ -174,6 +180,12 @@ FBgetpixel( FB *f, unsigned short x, unsigned short y)
 #define FBbitblt(f,fbb) FB_ATOMIC(f,(*(f->bitblt))(f,fbb))
 
 #define FBputchar(f,x,y,fgcol,bgcol,ch) FB_ATOMIC(f,(*(f->putchar))(f,x,y,fgcol,bgcol,ch))
+
+static inline u_int32_t
+FBc24_to_cnative(FB *f, u_int32_t col) FB_ATOMIC_RETURN(f,(*(f->c24_to_cnative))(f,col))
+
+static inline u_int32_t
+FBcnative_to_c24(FB *f, u_int32_t col) FB_ATOMIC_RETURN(f,(*(f->cnative_to_c24))(f,col))
 
 #define FBchunk_to_native(f,srcblock,dstblock)  FB_ATOMIC(f,(*(f->sp8_convert))(f,srcblock,dstblock))
 
@@ -189,8 +201,12 @@ FBCMAP  *FBgetcmap(FB *f);
 void    FBputcmap(FB *f, FBCMAP *fbcmap);
 void    FBfreecmap(FBCMAP *fbcmap);
 
-u_int32_t FBc24_to_cnative(FB *f, u_int32_t col24);
-u_int32_t FBcnative_to_c24(FB *f, u_int32_t col);
+/*
+ * These are no longer valid as functions. See defines above. 
+ *
+ * u_int32_t FBc24_to_cnative(FB *f, u_int32_t col24);
+ * u_int32_t FBcnative_to_c24(FB *f, u_int32_t col);
+ */
 
 /* bitblt functions */
 
