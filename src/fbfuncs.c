@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "ofbis.h"
+#include "fballoc.h"
 #include "fberror.h"
 #include "fbpixel.h"
 #include "fbhline.h"
@@ -151,10 +152,10 @@ FBsetfuncs( FB *f )
    * We must do this, because the resolution may have changed. 
    */
   if(f->cmap) {
-    free(f->cmap->red);
-    free(f->cmap->green);
-    free(f->cmap->blue);
-    free(f->cmap);
+    FBfree(f->cmap->red);
+    FBfree(f->cmap->green);
+    FBfree(f->cmap->blue);
+    FBfree(f->cmap);
   }
 
   /* Reserve memory for the internal palette. */
