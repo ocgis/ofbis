@@ -216,7 +216,7 @@ FBfindFB( void )
 
   /* Get current VT number so we can find which FB struct to use */
 
-  fprintf (stderr, "ofbis: FBfindFB: pid %d\n", getpid ());
+  /*  fprintf (stderr, "ofbis: FBfindFB: pid %d\n", getpid ()); */
 
   if ( ioctl( curcon, VT_GETSTATE, &vts ) == -1 )
   {
@@ -233,7 +233,7 @@ FBfindFB( void )
              ttynames[cttyname]);
   }
 
-  fprintf (stderr, "ofbis: FBfindFB: returning 0x%lx\n", (long)f);
+  /*  fprintf (stderr, "ofbis: FBfindFB: returning %p\n", f); */
 
   return f;
 }
@@ -243,6 +243,11 @@ FBVTswitch(int s)
 {
   static  FB              *f;             /* Non reentrant */
   /*static        unsigned short  switching;*/    /* Flag to prevent reentrancy */
+
+  /*
+  fprintf(stderr,"FBVTswitch: signalnum=%d\n",s);
+  fprintf(stderr,"FBVTswitch: switching=%d\n",switching);
+  */
 
   /* Set this handler again, otherwise signal reverts to default handling */
 
