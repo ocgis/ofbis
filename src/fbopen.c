@@ -11,7 +11,6 @@
 #include "fbmmap.h"
 #include "fbmouse.h"
 #include "fbchar.h"
-#include "linea/lainit.h"
 
 FB *
 FBopen( const char *fbname, unsigned short opts )
@@ -57,6 +56,7 @@ FBopen( const char *fbname, unsigned short opts )
 	FBmouseopen();
 
 	/* Setup fontinfo */
+
 	FBfontopen(f);
 
 	/*f->fb=open(fbname,O_RDWR);*/
@@ -78,18 +78,6 @@ FBopen( const char *fbname, unsigned short opts )
 
 	FBputvar(f);
 
-	/* Setup linea if needed */
-
-	if ( opts & FB_LINEA )
-	{
-		f->linea = LAalloc();
-		LAgetvars( f, f->linea );
-	}
-	else
-	{
-		f->linea = NULL;
-	}
-
 	/* Map fb into memory */
 
 	FBmap(f);
@@ -105,14 +93,8 @@ FBclose( FB *f )
 
 	FBunmap(f);
 
-	/* Remove linea if needed */
-
-	if ( f->linea )
-	{
-		LAfree( f->linea );
-	}
-
 	/* Free fontinfo */
+
 	FBfontclose(f);
 
 	/* Close mouse */

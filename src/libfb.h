@@ -5,7 +5,6 @@
 
 #include <sys/time.h>
 #include <linux/fb.h>
-#include "linea/linea.h"
 
 typedef struct fbcmap
 {
@@ -68,7 +67,6 @@ struct fbinf
 	struct fb_fix_screeninfo	finf;		/* fixed screen info */
 	struct fb_var_screeninfo	vinf;		/* variable screen info */
 	FBCMAP				*cmap;		/* current colourmap */
-	FBLINEA				*linea;		/* line-A structure */
 	FBFONT				*font;		/* current font */
 
 	/* Drawing functions */
@@ -94,7 +92,6 @@ struct fbinf
 
 #define	FB_KEEP_CURRENT_VC	0x0000
 #define	FB_OPEN_NEW_VC		0x0001
-#define FB_LINEA		0x0002
 
 FB	*FBopen(const char *fbname, unsigned short opts);
 int	FBclose(FB *f);

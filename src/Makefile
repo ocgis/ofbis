@@ -13,14 +13,13 @@ OBJS= $(SRCS:%.c=%.o)
 
 MAINOBJS = libfb.o
 
-SUBDIRS = linea fonts
-SUBDIROBJS = linea/linea.o fonts/fonts.o
+SUBDIRS = fonts
+SUBDIROBJS = fonts/fonts.o
 
 
 # shared library stuff
 
 SHARED_OBJS= $(OBJS:%.o=shared/%.o) \
-             linea/shared/laentry.o linea/shared/lafuncs.o linea/shared/lainit.o \
              fonts/shared/font_6x11.o fonts/shared/font_8x8.o fonts/shared/font_8x16.o
 
 SHARED_LIB=libfb.so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_SUBMINOR)
@@ -55,10 +54,9 @@ subdirs: force
 	done
 
 install:
-	mkdir -p $(PREFIX)/include/fb/linea
+	mkdir -p $(PREFIX)/include/fb
 	cp libfb.a $(PREFIX)/lib
 	cp libfb.h $(PREFIX)/include/fb
-	cp linea/linea.h $(PREFIX)/include/fb/linea
 	cp $(SHARED_LIB) $(PREFIX)/lib
 	cd $(PREFIX)/lib
 	rm -f $(SHARED_MAJORNAME)
