@@ -16,6 +16,7 @@ setinterleave1( FB *f )
 	f->line = &genln;
 	f->putchar = &i2pc1;
 	f->sp8_convert = &sp8_to_i1;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -27,6 +28,7 @@ setinterleave2( FB *f )
 	f->line = &genln;
 	f->putchar = &i2pc2;
 	f->sp8_convert = &sp8_to_i2;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -38,6 +40,7 @@ setinterleave4( FB *f )
 	f->line = &genln;
 	f->putchar = &i2pc4;
 	f->sp8_convert = &sp8_to_i4;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -49,6 +52,7 @@ setinterleave8( FB *f )
 	f->line = &genln;
 	f->putchar = &i2pc8;
 	f->sp8_convert = &sp8_to_i8;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -60,6 +64,7 @@ settruecolor( FB *f )
 	f->line = &genln;
 	f->putchar = &pctc;
 	f->sp8_convert = &sp8_to_tc;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -71,6 +76,7 @@ setpackedpixel8( FB *f )
 	f->line = &genln;
 	f->putchar = &pcspc;
 	f->sp8_convert = &sp8_to_sp8;
+	f->bitblt = &sp8_bitblt;
 }
 
 static void
@@ -82,6 +88,7 @@ setplanes1( FB *f )
 	f->line = &genln;
 	f->putchar = &plpc1;
 	f->sp8_convert = &sp8_to_p1;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -93,6 +100,7 @@ setplanes2( FB *f )
 	f->line = &genln;
 	f->putchar = &plpc2;
 	f->sp8_convert = &sp8_to_p2;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -104,6 +112,7 @@ setplanes4( FB *f )
 	f->line = &genln;
 	f->putchar = &plpc4;
 	f->sp8_convert = &sp8_to_p4;
+	f->bitblt = &bitblt;
 }
 
 static void
@@ -115,6 +124,7 @@ setplanes8( FB *f )
 	f->line = &genln;
 	f->putchar = &plpc8;
 	f->sp8_convert = &sp8_to_p8;
+	f->bitblt = &bitblt;
 }
 
 
@@ -128,7 +138,8 @@ void
 FBsetfuncs( FB *f )
 {
 	/* I believe only one type of bitblt is needed (Tomas) */
-	f->bitblt = &bitblt;
+        /* You believe wrong.. */
+        /* f->bitblt = &bitblt; */
 
 	if ( f->finf.type == FB_TYPE_INTERLEAVED_PLANES )
 	{

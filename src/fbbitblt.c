@@ -77,6 +77,21 @@
 	case 0xF: d = (d & ~endmask) | (ALL_BLACK(s,d)	& endmask);	break;	\
 	}
 
+void
+sp8_bitblt( FB *f, FBBLTPBLK *fbb )
+{
+  void *sbase, *dbase;
+  int hcnt;
+  sbase = (void *) (fbb->s_form + fbb->s_xmin + (fbb->s_ymin * fbb->s_nxln));
+  dbase = (void *) (fbb->d_form + fbb->d_xmin + (fbb->d_ymin * fbb->d_nxln));
+
+  for(hcnt = 0; hcnt < fbb->b_ht; hcnt++) {
+    memcpy(dbase, sbase, fbb->b_wd);
+    sbase += fbb->s_nxln;
+    dbase += fbb->d_nxln;
+  }
+}
+
 void 
 bitblt( FB *f, FBBLTPBLK *fbb )
 {
