@@ -234,17 +234,17 @@ main( int argc, char **argv )
   FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, 11,0, 's');
 
 #define puttext_tc(x,y)  \
-  FBputchar(f, fnt.width*0+x,y, 0x55555500,0, 'N'); \
-  FBputchar(f, fnt.width*1+x,y, 0x66666600,0, 'o'); \
-  FBputchar(f, fnt.width*2+x,y, 0x77777700,0, 'C'); \
-  FBputchar(f, fnt.width*3+x,y, 0x88888800,0, 'r'); \
-  FBputchar(f, fnt.width*4+x,y, 0x99999900,0, 'e'); \
-  FBputchar(f, fnt.width*5+x,y, 0xaaaaaa00,0, 'w'); \
-  FBputchar(f, fnt.width/2+fnt.width*0+x,fnt.height+y, 0xbbbbbb00,0, 'R'); \
-  FBputchar(f, fnt.width/2+fnt.width*1+x,fnt.height+y, 0xcccccc00,0, 'u'); \
-  FBputchar(f, fnt.width/2+fnt.width*2+x,fnt.height+y, 0xdddddd00,0, 'l'); \
-  FBputchar(f, fnt.width/2+fnt.width*3+x,fnt.height+y, 0xeeeeee00,0, 'e'); \
-  FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, 0xffffff00,0, 's');
+  FBputchar(f, fnt.width*0+x,y, FBc24_to_cnative(f, 0x00550000),0, 'N'); \
+  FBputchar(f, fnt.width*1+x,y, FBc24_to_cnative(f, 0x00007700),0, 'o'); \
+  FBputchar(f, fnt.width*2+x,y, FBc24_to_cnative(f, 0x00000099),0, 'C'); \
+  FBputchar(f, fnt.width*3+x,y, FBc24_to_cnative(f, 0x00bb0000),0, 'r'); \
+  FBputchar(f, fnt.width*4+x,y, FBc24_to_cnative(f, 0x0000dd00),0, 'e'); \
+  FBputchar(f, fnt.width*5+x,y, FBc24_to_cnative(f, 0x000000ff),0, 'w'); \
+  FBputchar(f, fnt.width/2+fnt.width*0+x,fnt.height+y, FBc24_to_cnative(f, 0x00333333),0, 'R'); \
+  FBputchar(f, fnt.width/2+fnt.width*1+x,fnt.height+y, FBc24_to_cnative(f, 0x00666666),0, 'u'); \
+  FBputchar(f, fnt.width/2+fnt.width*2+x,fnt.height+y, FBc24_to_cnative(f, 0x00999999),0, 'l'); \
+  FBputchar(f, fnt.width/2+fnt.width*3+x,fnt.height+y, FBc24_to_cnative(f, 0x00cccccc),0, 'e'); \
+  FBputchar(f, fnt.width/2+fnt.width*4+x,fnt.height+y, FBc24_to_cnative(f, 0x00ffffff),0, 's');
   {  
     FBFONT fnt;
     
