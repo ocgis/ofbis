@@ -1,8 +1,6 @@
 Framebuffer Library Programming Reference
 =========================================
 
-N.B. Tabsize for this and all ofbis files is 8, like linux.
-
 A minimal framebuffer program would have something like:
 
 	{
@@ -36,7 +34,8 @@ FB_OPEN_NEW_VC: The first available console will be opened and switched to for
 		display.
 The above two options are mutually exclusive.
 
-It returns a handle for the opened framebuffer.
+It returns a handle for the opened framebuffer. If an error occured, NULL
+is returned. 
 
 void FBclose( FB *f )
 ---------------------
@@ -44,29 +43,34 @@ void FBclose( FB *f )
 FBclose shuts the framebuffer f, and if FB_OPEN_NEW_VC was selected when f was
 opened, switches to the console that was current when FBopen was called.
 
+
 Graphics functions
 ==================
 
-void FBputpixel( FB *f, unsigned short x, unsigned short y, unsigned long col )
--------------------------------------------------------------------------------
+The colour value given to the graphics functions are always in the current
+display's native form. That means a palette based mode gives the index of
+the colour, and a true-/directcolour mode gives the colour value.
+
+
+void FBputpixel( FB *f, u_int16_t x, u_int16_t y, u_int32_t col )
+-----------------------------------------------------------------
 
 FBputpixel draws a single point at (x,y) on framebuffer f, with colour col.
 
-unsigned long FBgetpixel( FB *f, unsigned short x, unsigned short y )
----------------------------------------------------------------------
+u_int32_t FBgetpixel( FB *f, u_int16_t x, u_int16_t y )
+-------------------------------------------------------
 
 FBgetpixel returns the colour value at the point (x,y) on framebuffer f.
 
-void FBhline( FB *f, unsigned short x1, unsigned short x2, unsigned short y,
-		unsigned long col )
-----------------------------------------------------------------------------
+void FBhline( FB *f, u_int16_t x1, u_int16_t x2, u_int16_t y, u_int32_t col )
+-----------------------------------------------------------------------------
 
 FBhline draws a horizontal line on framebuffer f from (x1,y) to (x2,y) with
 colour col.
 
-void FBline( FB *f, unsigned short x1, unsigned short y1, unsigned short x2,
-		unsigned short y2, unsigned long col )
-----------------------------------------------------------------------------
+void FBline( FB *f, u_int16_t x1, u_int16_t y1, u_int16_t x2, u_int16_t y2, 
+             u_int32_t col )
+---------------------------------------------------------------------------
 
 FBline draws a line from (x1,y1) to (x2,y2) on framebuffer f with colour col.
 
@@ -74,14 +78,18 @@ void FBbitblt( FB *f, FBBLTPBLK *fbb)
 -------------------------------------
 
 FBbitblt blits a rectangular block from one memory area to another. It is
-not limited to the framebuffer area.
+not limited to the framebuffer area for most display types. However, those
+that do not have their own bitblt function implemented uses putpixel/getpixel
+for this. VGA16 is one of these.
 
-void FBputchar( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, 
-		unsigned long bgcol, unsigned char ch )
--------------------------------------------------------------------------------
+void FBputchar( FB *f, u_int16_t x, u_int16_t y, u_int32_t fgcol, 
+		u_int32_t bgcol, unsigned char ch )
+-----------------------------------------------------------------
 
-FBputchar puts one character, ch, at (x,y) with colour fgcol. bgcol is
-currently unused, and might be removed in a later version!
+FBputchar puts one character, ch, at (x,y) with colour fgcol and background
+colour bgcol. If the highest bit in bgcol is set (0x80000000), the character
+is drawn with transparent background.
+
 
 Colourmap functions
 ===================
@@ -106,6 +114,23 @@ void FBfreecmap( FBCMAP *fbcmap )
 
 FBfreecmap frees the fbcmap allocated with FBgetcmap.
 
+u_int32_t FBc24_to_cnative( FB *f, u_int32_t col )
+--------------------------------------------------
+
+Convert a 24-bit colour value (0x00rrggbb) into the format of the current 
+display type. If the current display type is a palette based mode, this 
+function will search for the best match in the current palette and return 
+the index to that colour. This means it can be slow to use for each pixel.
+
+u_int32_t FBcnative_to_c24( FB *f, u_int32_t col )
+--------------------------------------------------
+
+Convert a native colour value into a 24-bit colour value (0x00rrggbb). If 
+the current display type is a palette based mode, the native colour is an
+index to the palette, and the colour from the current palette at that index
+will be returned. 
+
+
 Screen settings functions (likely to be made private)
 =====================================================
 
@@ -113,8 +138,8 @@ void FBgetfix( FB *f )
 void FBgetvar( FB *f )
 void FBputvar( FB *f )
 
-These all correspond directly to the fixed and variable structures used with the
-linux framebuffer. Mainly used to simplify things at this early stage.
+These all correspond directly to the fixed and variable structures used with 
+the linux framebuffer. Mainly used to simplify things at this early stage.
 
 Debug functions (likely to be made private)
 ===========================================
@@ -125,3 +150,16 @@ void FBcmapdump( FB *f )
 
 For library programming only. You can work them out. 8-)
 
+
+Still undocumented
+==================
+
+- Events (mouse, keyboard)
+- Fonts
+- More on bitblt
+- Extra options for FBopen()
+
+
+--
+Martin Mitchell
+Tomas Berndtsson
