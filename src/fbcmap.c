@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include "ofbis.h"
 #include "fballoc.h"
