@@ -19,7 +19,7 @@ typedef FB      *FBListValType;
 
 #include "fblist.h"
 
-static  char            *ttynames[]={"/dev/console", "/dev/tty", "/dev/tty0", NULL};
+static  char            *ttynames[]={"/dev/tty0", "/dev/tty", NULL};
 static  char            *ttyfmts[]={"/dev/tty%d", "/dev/tty%02x", "/dev/tty%x", "/dev/tty%02d", NULL};
 static  int             cttyname = 0;
 static  int             originaltty;
