@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <string.h>
+#include <sys/poll.h>
 #include "ofbis.h"
 #include "fberror.h"
 #include "fbevent.h"
@@ -14,91 +15,85 @@
 #include "fbmouse.h"
 
 
+#define POLLMASK (POLLIN)
+
 /*
 ** Description
-** Get one keyboard or mouse event
+** Check for keyboard or mouse event with possible timeout
+** Timeout value in milliseconds, -1 means forever
 **
 ** 1998-08-06 CG
+** 1999-05-20 Tomas
 */
 void
-FBgetevent (FB *f, FBEVENT *ev) {
+FBcheckevent (FB *f, FBEVENT *ev, int timeout) {
   int interrupted;
-  fd_set	in;
-  
-  FD_ZERO (&in);
-  FD_SET (f->tty, &in);
+  struct pollfd in[2];
+  int nfds=1, ret;
+
+  in[0].fd = f->tty;
+  in[0].events = POLLMASK;
 
   if ((f->sbuf != f->sbak) && (msefd != -1)) {
-    FD_SET( msefd, &in );
+    in[1].fd = msefd;
+    in[1].events = POLLMASK;
     tcflush( msefd, TCIFLUSH );
+    nfds = 2;
   }
-  
+
   do {
     interrupted = FALSE;
-    
-    if (select (FD_SETSIZE, &in, NULL, NULL, NULL) == -1) {
-      if (errno==EINTR) {
-	interrupted = TRUE;
 
+    ret = poll(in, nfds, timeout);
+    if(ret == -1) {
+      if(errno == EINTR) {
+	interrupted = TRUE;
+	
 	if (msefd != -1) {
 	  if (f->sbuf == f->sbak) {
-	    FD_CLR( msefd, &in );
+	    nfds = 1;
 	  } else {
-	    FD_SET( msefd, &in );
+	    in[1].fd = msefd;
+	    in[1].events = POLLMASK;
 	    tcflush( msefd, TCIFLUSH );
+	    nfds = 2;
 	  }
 	}
       } else {
-	FBerror( FATAL | SYSERR, "FBgetevent: select() returned" );
+	/*
+	fprintf(stderr,"ofbis: fbevent.c: tty fd=%d\n", in[0].fd);
+	fprintf(stderr,"ofbis: fbevent.c: tty revents=0x%x\n",in[0].revents);
+	fprintf(stderr,"ofbis: fbevent.c: mouse fd=%d\n", in[1].fd);
+	fprintf(stderr,"ofbis: fbevent.c: mouse revents=0x%x\n",in[1].revents);
+	*/
+	FBerror( FATAL | SYSERR, "FBcheckevent: poll() returned" );
       }
     }
-  } while ( interrupted );
+  } while(interrupted);
 
-  if (FD_ISSET (f->tty, &in)) {
+  if(ret == 0) { /* if poll() timed out */
+    ev->type = FBNoEvent;
+  } else if(in[0].revents & POLLIN) {
     ev->type = FBKeyEvent;
     FBprocesskey (f, &ev->key);
-  } else if (FD_ISSET (msefd, &in)) {
+  } else if(in[1].revents & POLLIN) {
     ev->type = FBMouseEvent;
     FBprocessmouse (&ev->mouse);		
     /*		printf("buttons: %d x: %d y: %d\n",ev->mouse.buttons, ev->mouse.x, ev->mouse.y ); */
   }
 }
 
+/*
+** Description
+** Get one keyboard or mouse event
+** This is the same as FBcheckevent, but with infinite timeout
+**
+** 1998-08-06 CG
+** 1999-05-20 Tomas
+*/
 void
-FBcheckevent( FB *f, FBEVENT *ev, struct timeval *tv )
-{
-	fd_set	in;
-
-	FD_ZERO( &in );
-	FD_SET( f->tty, &in );
-	if ( f->sbuf != f->sbak )
-	{
-		FD_SET( msefd, &in );
-		tcflush( msefd, TCIFLUSH );
-	}
-
-	if ( select( FD_SETSIZE, &in, NULL, NULL, tv ) != -1)
-	{
-		if ( FD_ISSET( f->tty, &in ) )
-		{
-			ev->type = FBKeyEvent;
-			FBprocesskey( f, &ev->key );
-		}
-		else if ( FD_ISSET( msefd, &in ) )
-		{
-			ev->type = FBMouseEvent;
-			FBprocessmouse( &ev->mouse );		
-/*			printf("buttons: %d x: %d y: %d\n",ev->mouse.buttons, ev->mouse.x, ev->mouse.y ); */
-		}
-		else
-		{
-			ev->type = FBNoEvent;
-		}
-	}
-	else
-	{
-		ev->type = FBNoEvent;
-	}
+FBgetevent (FB *f, FBEVENT *ev) {
+  FBcheckevent(f, ev, -1);
 }
 
 int
