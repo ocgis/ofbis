@@ -5,7 +5,6 @@
 extern int msefd;
 
 void	FBmouseopen( void );
-int	FBmouseget( void );
 void	FBprocessmouse( FBMOUSEEVENT *ev );
 void	FBmouseclose( void );
 
