@@ -285,6 +285,11 @@ FBVTswitch(int s)
         FBerror( FATAL | SYSERR, "FBVTswitch: failed to allocate backing store");
       }
       
+      /*
+      fprintf (stderr, "ofbis: fbvt.c: FBVTswitch: 23 sbak=%p sbuf=%p smem_len=0x%lx (%ld)\n",
+               f->sbak, f->sbuf, f->finf.smem_len, f->finf.smem_len);
+      */
+
       /* Copy framebuffer to backing store */
       
       (void) memcpy( f->sbak, f->sbuf, f->finf.smem_len );
@@ -322,10 +327,10 @@ FBVTswitch(int s)
       (void) memcpy( f->sbuf, f->sbak, f->finf.smem_len );
       
       /* Free backing store */
-      fprintf (stderr, "ofbis: FBclose: calling FBfree with sbak = 0x%x\n", f->sbak);
+      fprintf (stderr, "ofbis: FBclose: calling FBfree with sbak = %p\n", f->sbak);
       
       FBfree (f->sbak);
-      fprintf (stderr, "ofbis: FBclose: called FBfree with sbak = 0x%x\n", f->sbak);
+      fprintf (stderr, "ofbis: FBclose: called FBfree with sbak = %p\n", f->sbak);
       f->sbak=NULL;
     }
 
