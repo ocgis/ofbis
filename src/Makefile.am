@@ -1,5 +1,5 @@
 # Include files goes into a special directory
-fbdir = @prefix@/include/fb
+fbdir = @includedir@/fb
 fb_HEADERS = libfb.h
 
 # Make a shared library using libtool

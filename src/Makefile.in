@@ -72,7 +72,7 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-fbdir = @prefix@/include/fb
+fbdir = @includedir@/fb
 fb_HEADERS = libfb.h
 
 # Make a shared library using libtool

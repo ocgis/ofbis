@@ -2,7 +2,10 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(fbtst.c)
 AM_INIT_AUTOMAKE(ofbis, 0.0.6)
 AM_CONFIG_HEADER(config.h)
-CFLAGS="-Wall -O2 -pipe -fomit-frame-pointer -fno-strength-reduce"
+
+dnl Set CFLAGS
+CFLAGS="$CFLAGS -Wall -O2 -pipe -fomit-frame-pointer -fno-strength-reduce"
+
 AM_PROG_LIBTOOL
 
 dnl Checks for programs.
