@@ -163,6 +163,8 @@ pctc(FB *f,
     for (p = 0; p < f->font->width; p++) {
       if (data & 0x80) {
 	*base = (unsigned short)fgcol;
+      } else if (!(bgcol & 0x80000000)) {
+	*base = (unsigned short)0xffff; /* Hack to make white if bgcol == 0 which is really an error */
       }
 
       base++;
@@ -199,6 +201,8 @@ pcsp8 (FB *f,
     for (p = 0; p < f->font->width; p++) {
       if (data & 0x80) {
 	*base = fgcol;
+      } else if (!(bgcol & 0x80000000)) {
+	*base = bgcol;
       }
 
       base++;
