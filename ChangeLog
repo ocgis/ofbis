@@ -1,3 +1,7 @@
+2000-10-18  Tomas Berndtsson  <tomas@nocrew.org>
+
+	* Released version 0.1.1.
+
 2000-10-15  Tomas Berndtsson  <tomas@nocrew.org>
 
 	* Support for VGA16 framebuffer (4-bit VGA).
