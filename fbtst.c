@@ -8,6 +8,7 @@
 #define CHARTEST
 #undef CMAPTEST
 #define EVENTTEST
+#undef DUMPTEST
 
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
@@ -102,8 +103,10 @@ main( int argc, char **argv )
     printf("%ld\n",FBgetpixel(f,i,10));
   }*/
 	
-  /*FBfinfdump(f);
-  FBvinfdump(f);*/
+#ifdef DUMPTEST
+  FBfinfdump(f);
+  FBvinfdump(f);
+#endif /* DUMPTEST */
 
   {
     unsigned short sx,sy,dx,dy,wd,ht;

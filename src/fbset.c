@@ -42,7 +42,9 @@ FBputvar( FB *f )
 {
 	if (ioctl(f->fb,FBIOPUT_VSCREENINFO, &f->vinf) == -1 )
 	{
-		FBerror( FATAL | SYSERR, "FBputvar: Put variable screen settings failed" );
+	  /* Don't quit, because the sparc crashes then. */
+	  /*		FBerror( FATAL | SYSERR, "FBputvar: Put variable screen settings failed" ); */
+	  	FBerror( SYSERR, "FBputvar: Put variable screen settings failed" );
 	}
 
 	if (ioctl(f->fb,FBIOGET_FSCREENINFO, &f->finf) == -1 )

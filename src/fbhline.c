@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "ofbis.h"
 #include "fbhline.h"
 
