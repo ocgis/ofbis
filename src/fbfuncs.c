@@ -139,11 +139,31 @@ setplanes8( FB *f )
 void
 FBsetfuncs( FB *f )
 {
+  int length;
+
   /*
   fprintf(stderr, "finf.type: %d\n", f->finf.type);
   fprintf(stderr, "finf.visual: %d\n", f->finf.visual);
   fprintf(stderr, "vinf.bits_per_pixel: %d\n", f->vinf.bits_per_pixel);
   */
+
+  /* If there's reserved space already, free it. 
+   * We must do this, because the resolution may have changed. 
+   */
+  if(f->cmap) {
+    free(f->cmap->red);
+    free(f->cmap->green);
+    free(f->cmap->blue);
+    free(f->cmap);
+  }
+
+  /* Reserve memory for the internal palette. */
+  f->cmap = (FBCMAP *) FBalloc( sizeof(FBCMAP) );
+  length = 1<<f->vinf.bits_per_pixel;
+  f->cmap->red=(unsigned short *) FBalloc( length * sizeof(unsigned short) );
+  f->cmap->green=(unsigned short *) FBalloc( length * sizeof(unsigned short) );
+  f->cmap->blue=(unsigned short *) FBalloc( length * sizeof(unsigned short) );
+  
 
   switch(f->finf.type) { /* FB_TYPE_* */
   case FB_TYPE_INTERLEAVED_PLANES:
