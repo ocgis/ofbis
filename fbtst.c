@@ -4,7 +4,8 @@
 #include "src/libfb.h"
 #include "src/fbevent.h"
 
-#define CHARTEST 1
+#define CHARTEST
+#undef BLITTEST
 
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
@@ -51,7 +52,7 @@ main( int argc, char **argv )
 	long	c;
 #endif /* BLITTEST */
 
-	if ((f=FBopen(NULL,FB_OPEN_NEW_VC | FB_LINEA/*FB_KEEP_CURRENT_VC*/))==NULL)
+	if ((f=FBopen(NULL,FB_OPEN_NEW_VC /*FB_KEEP_CURRENT_VC*/))==NULL)
 		printf("FBinit f failed");
 
 

@@ -36,8 +36,6 @@ FB_OPEN_NEW_VC: The first available console will be opened and switched to for
 		display.
 The above two options are mutually exclusive.
 
-FB_LINEA: Enable the oFBis Line-A emulation. It is of little use except for oFBis.
-
 It returns a handle for the opened framebuffer.
 
 void FBclose( FB *f )

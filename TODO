@@ -2,8 +2,6 @@ better fbtst program!
 
 Update doc/* for event functions
 
-Improved wrappers for bitblt.
-
 resolution selection code: need some way for users to select a resolution,
 independent of hardware. Such as a picture viewer wanting 640x480x256, if
 that is not available perhaps it could be offered the 'nearest' modes, for
@@ -14,6 +12,6 @@ HAM8 and HAM6 support.
 
 Interleaved planes for OCS/ECS.
 
-filled rectangles/polylines/polygons/textblt
+filled rectangles/polylines/polygons
 
 And lots of other things I'm sure you can see 8-)
