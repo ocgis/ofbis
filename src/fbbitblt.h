@@ -5,7 +5,7 @@
 
 /* Bitblt functions */
 
-void	sp8_bitblt( FB *f, FBBLTPBLK *fbb );
+void	pp_bitblt( FB *f, FBBLTPBLK *fbb );
 void	bitblt( FB *f, FBBLTPBLK *fbb );
 
 #endif

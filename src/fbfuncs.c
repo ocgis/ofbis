@@ -64,7 +64,7 @@ settruecolor( FB *f )
 	f->line = &genln;
 	f->putchar = &pctc;
 	f->sp8_convert = &sp8_to_tc;
-	f->bitblt = &bitblt;
+	f->bitblt = &pp_bitblt;
 }
 
 static void
@@ -76,7 +76,7 @@ setpackedpixel8( FB *f )
 	f->line = &genln;
 	f->putchar = &pcspc;
 	f->sp8_convert = &sp8_to_sp8;
-	f->bitblt = &sp8_bitblt;
+	f->bitblt = &pp_bitblt;
 }
 
 static void
