@@ -64,6 +64,7 @@ FBVTopen(FB *f)
       FBerror( FATAL | SYSERR, "FBVTopen: couldn't get VT state");
     }
     f->ttyno = vts.v_active;
+    f->keeptty = TRUE;
   }
   else if ( f->vtchoice == FB_OPEN_NEW_VC )
   {
@@ -73,6 +74,7 @@ FBVTopen(FB *f)
     {
       FBerror( FATAL | SYSERR, "FBVTopen: no free ttys");
     }
+    f->keeptty = FALSE;
   }
   else
   {
@@ -110,20 +112,21 @@ FBVTopen(FB *f)
     chown(ttynam,getuid(),getgid());
     chown("/dev/console",getuid(),getgid());
     chown("/dev/tty0",getuid(),getgid());*/
-  {
-    int i;
 
-    if (!f->keeptty)
+  /* This seems unnecessary for us to do, but I'm still not sure. */
+#if 0
+  if (f->keeptty)
     {
+      int i;
       if ((i=open("/dev/tty",O_RDWR))>=0)
-      {
-        ioctl(i,TIOCNOTTY,0);
-        close(i);
-      }
+	{
+	  ioctl(i,TIOCNOTTY,0);
+	  close(i);
+	}
       /*setsid();*/
       /*ioctl(f->tty,TIOCSCTTY);*/
     }
-  }
+#endif
 
   /* Get current VT number so we can switch back to it later */
 
