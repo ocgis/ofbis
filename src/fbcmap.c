@@ -8,7 +8,7 @@ FBgetcmap( FB *f )
 {
 	static int	length=0;	/* length of colourmap */
 	struct fb_cmap	cmap;
-	FBCMAP		*fbcmap;	/* new colormap */
+	FBCMAP		*fbcmap;	/* new colourmap */
 
 	fbcmap = (FBCMAP *) FBalloc( sizeof(FBCMAP) );
 

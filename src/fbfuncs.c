@@ -56,7 +56,7 @@ setinterleave8( FB *f )
 }
 
 static void
-settruecolor( FB *f )
+settruecolour( FB *f )
 {
 	f->putpixel = &pptc;
 	f->getpixel = &gptc;
@@ -165,7 +165,7 @@ FBsetfuncs( FB *f )
 	    break;
 
 	  case FB_VISUAL_TRUECOLOR:
-	    settruecolor(f);
+	    settruecolour(f);
 	    break;
 	  
 	  case FB_VISUAL_PSEUDOCOLOR:
