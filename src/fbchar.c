@@ -18,6 +18,22 @@
 void
 genpc( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch )
 {
+  int ox, oy;
+  register unsigned char *chardata = &f->font->data [f->font->height * ch];
+  register unsigned char data;
+
+  for (oy = 0; oy < f->font->height; oy++) {
+    data = *chardata++;
+
+    for (ox = 0; ox < f->font->width; ox++) {
+      if (data & 0x80) {
+	(*f->putpixel)(f, x+ox, y+oy, fgcol);
+      }
+
+      data <<= 1;
+    }
+
+  }
 }
 
 void
@@ -122,21 +138,55 @@ i2pc8( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned 
 	}
 }
 
+/*
+** Description
+** Put a character to a 16-bit truecolour fb
+**
+*/
 void
-pctc( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch )
+pctc(FB *f,
+     unsigned short x,
+     unsigned short y,
+     unsigned long fgcol,
+     unsigned long bgcol,
+     unsigned char ch )
 {
+  int row;
+  register unsigned short *base = ((unsigned short *)f->sbuf) + 
+				   (x + y * f->vinf.xres_virtual);
+  register unsigned char *chardata = &f->font->data[f->font->height * ch];
+  unsigned char *cp= (char *)&fgcol;
+  unsigned short tc_col;
+  
+  tc_col = (( *cp++ << 8 ) & 0xF800 ) |
+	   (( *++cp << 3 ) & 0x07E0 ) |
+	   (( *++cp >> 3 ) & 0x001F );
+
+  for (row = 0; row < f->font->height; row++, chardata++) {
+    register unsigned char data = *chardata;
+    int p;
+
+    for (p = 0; p < f->font->width; p++) {
+      if (data & 0x80) {
+	*base = tc_col;
+      }
+
+      base++;
+      data <<= 1;
+    }
+
+    base += f->vinf.xres_virtual - f->font->width;
+  }
 }
 
 
 /*
 ** Description
-** Put a character to a static pseudocolour fb
+** Put a character to an 8-bit static pseudocolour fb
 **
-** To be done
-** Fix for other colourdepths than 8 (one byte per pixel).
 */
 void
-pcspc (FB *f,
+pcsp8 (FB *f,
        unsigned short x,
        unsigned short y,
        unsigned long fgcol,
@@ -144,15 +194,15 @@ pcspc (FB *f,
        unsigned char ch )
 {
   int row;
-  register unsigned char * base =
-    (unsigned char*)f->sbuf + x + y * f->vinf.xres_virtual;
-  register unsigned char *chardata = &f->font->data [f->font->height * ch];
+  register unsigned char *base = ((unsigned char *)f->sbuf) + 
+				  (x + y * f->vinf.xres_virtual);
+  register unsigned char *chardata = &f->font->data[f->font->height * ch];
 
   for (row = 0; row < f->font->height; row++, chardata++) {
-    unsigned char data = *chardata;
-    int           p;
+    register unsigned char data = *chardata;
+    int p;
 
-    for (p = 0; p < 8; p++) {
+    for (p = 0; p < f->font->width; p++) {
       if (data & 0x80) {
 	*base = fgcol;
       }
@@ -161,11 +211,11 @@ pcspc (FB *f,
       data <<= 1;
     }
 
-    base += f->vinf.xres_virtual - 8;
+    base += f->vinf.xres_virtual - f->font->width;
   }
 }
 
-
+/* Yet to be optimized */
 void
 plpc1( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch )
 {

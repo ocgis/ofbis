@@ -74,7 +74,7 @@ setpackedpixel8( FB *f )
 	f->getpixel = &gpspc;
 	f->hline = &hlspc;
 	f->line = &genln;
-	f->putchar = &pcspc;
+	f->putchar = &pcsp8;
 	f->sp8_convert = &sp8_to_sp8;
 	f->bitblt = &pp_bitblt;
 }
@@ -86,7 +86,7 @@ setplanes1( FB *f )
 	f->getpixel = &plgp1;
 	f->hline = &plhl1;
 	f->line = &genln;
-	f->putchar = &plpc1;
+	f->putchar = &genpc;
 	f->sp8_convert = &sp8_to_p1;
 	f->bitblt = &bitblt;
 }
@@ -98,7 +98,7 @@ setplanes2( FB *f )
 	f->getpixel = &plgp2;
 	f->hline = &plhl2;
 	f->line = &genln;
-	f->putchar = &plpc2;
+	f->putchar = &genpc;
 	f->sp8_convert = &sp8_to_p2;
 	f->bitblt = &bitblt;
 }
@@ -110,7 +110,7 @@ setplanes4( FB *f )
 	f->getpixel = &plgp4;
 	f->hline = &plhl4;
 	f->line = &genln;
-	f->putchar = &plpc4;
+	f->putchar = &genpc;
 	f->sp8_convert = &sp8_to_p4;
 	f->bitblt = &bitblt;
 }
@@ -122,7 +122,7 @@ setplanes8( FB *f )
 	f->getpixel = &plgp8;
 	f->hline = &plhl8;
 	f->line = &genln;
-	f->putchar = &plpc8;
+	f->putchar = &genpc;
 	f->sp8_convert = &sp8_to_p8;
 	f->bitblt = &bitblt;
 }

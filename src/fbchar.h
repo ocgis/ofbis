@@ -11,14 +11,7 @@ void	i2pc2( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsi
 void	i2pc4( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
 void	i2pc8( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
 void	pctc( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
-
-void	pcspc (FB *f,
-	       unsigned short x,
-	       unsigned short y,
-	       unsigned long fgcol,
-	       unsigned long bgcol,
-	       unsigned char ch);
-
+void	pcsp8( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch);
 void	plpc1( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
 void	plpc2( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
 void	plpc4( FB *f, unsigned short x, unsigned short y, unsigned long fgcol, unsigned long bgcol, unsigned char ch );
