@@ -218,6 +218,7 @@ FBsetfuncs( FB *f )
       break;
 
     case FB_VISUAL_TRUECOLOR:
+    case FB_VISUAL_DIRECTCOLOR:
       settruecolour(f);
       break;
           
