@@ -1,22 +1,31 @@
 /* VGA planes 4 bits per pixel */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <stdio.h>
+#include "ofbis.h"
+#include "error.h"
+
+/* Not having sys/io.h means we can't support this display mode. 
+ * Therefore, we just skip this whole file, except for a different
+ * register function at the bottom, which prints undefined display.
+ */
+#ifdef HAVE_SYS_IO_H
 #include <unistd.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/io.h>
 
-#include "ofbis.h"
 #include "common.h"
 #include "bitblt.h"
-#include "error.h"
 
 /* Initialize the VGA controller. Return 0 on error */
 static int
 vga_4_init(FB *f)
 {
-  if (-1 == ioperm (0x3c0, 0x20, 1))
-      return 0;
+  if(ioperm(0x3c0, 0x20, 1) == -1)
+    return 0;
 
   /* Set the Enable Set/Reset Register. */
   outb(1, 0x3ce);
@@ -129,3 +138,13 @@ vga_4_register_functions(FB *f)
   f->c24_to_cnative = &vga_4_c24_to_cnative;
   f->cnative_to_c24 = &vga_4_cnative_to_c24;
 }
+
+#else /* HAVE_SYS_IO_H */
+
+void
+vga_4_register_functions(FB *f)
+{
+  FBerror(FATAL | SYSERR, "vga_4: unsupported mode on this platform.");
+}
+
+#endif /* HAVE_SYS_IO_H */
