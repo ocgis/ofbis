@@ -11,7 +11,7 @@ libofbis_la_SOURCES = \
 	alloc.c char.c cmap.c debug.c error.c \
 	event.c funcs.c kbd.c mouse.c open.c bitblt.c \
 	set.c vt.c mmap.c font_6x11.c font_8x8.c font_8x14.c font_8x16.c \
-	alloc.h error.h mmap.h vt.h \
+	common.h alloc.h error.h mmap.h vt.h bitblt.h \
 	event.h kbd.h mouse.h char.h funcs.h \
 	keys.h list.h
 
