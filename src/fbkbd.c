@@ -98,10 +98,17 @@ FBkbdgetkey( FB *f )
         }
 
 
+/*
+** Description
+** Translate raw scancode into keycode
+**
+** 1999-03-10 CG
+*/
+static
 int
 translate_key (int  fd,
+               char table,
                char index) {
-  char           table = 0;
   struct kbentry ke;
 
   ke.kb_index = index;
@@ -116,6 +123,12 @@ translate_key (int  fd,
 }
 
 
+/*
+** Description
+** Process a keypress
+**
+** 1999-03-10 CG
+*/
 void
 FBprocesskey( FB *f, FBKEYEVENT *ev )
 {
@@ -124,6 +137,7 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   int             scancode = ( 0x7f & key );
   int             pressed = ( ( 0x80 & key ) ? FALSE : TRUE );
   static int      state = 0;
+  int             table;
 
   /*
   printf("Got scancode %d %s\n",scancode, pressed?"pressed":"released");
@@ -131,11 +145,26 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   printf("Key is 0x%04x\n", key);
   */
 
+  /* Choose the correct table */
+  if (ModifierDown (Mode_RShift) || ModifierDown (Mode_LShift)) {
+    if (ModifierDown (Mode_Alt)) {
+      table = K_ALTSHIFTTAB;
+    } else {
+      table = K_SHIFTTAB;
+    }
+  } else if (ModifierDown (Mode_Alt)) {
+    table = K_ALTTAB;
+  } else if (ModifierDown (Mode_Caps)) {
+    table = K_SHIFTTAB; /* Where is the capsmap? */
+  } else {
+    table = K_NORMTAB;
+  }
+
   /*
   fprintf (stderr, "ofbis: fbkbd.c: FBprocesskey: pid %d\n", getpid ());
   */
 
-  keycode = translate_key (f->tty, scancode);
+  keycode = translate_key (f->tty, table, scancode);
 
   /*
   fprintf (stderr, "ofbis: FBprocesskey: keycode=0x%x 0x%x\n", keycode, K_ALT);
@@ -145,6 +174,7 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   case K_SHIFTR :
     SETORCLEAR(Mode_RShift);
     break;
+  case K_SHIFT  :
   case K_SHIFTL :
     SETORCLEAR(Mode_LShift);
     break;
@@ -153,10 +183,11 @@ FBprocesskey( FB *f, FBKEYEVENT *ev )
   case K_CTRLR:
     SETORCLEAR(Mode_Ctrl);
     break;
-  case K_ALT:
+  case K_ALT   :
+  case K_ALTGR :
     SETORCLEAR(Mode_Alt);
     break;
-  case K_CAPSSHIFT:
+  case K_CAPS:
     if (!pressed) {
       break;
     }
